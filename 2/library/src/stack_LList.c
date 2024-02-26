@@ -3,7 +3,7 @@
 #include "stacklib.h"
 
 typedef struct Node{
-    char symbol;
+    char* symbol;
     struct Node* next;
 } Node;
 
@@ -28,7 +28,7 @@ void free_stack(stack_t* stack){
     free(stack);
 }
 
-int pop(stack_t* stack, char* symbol){
+int pop(stack_t* stack, char** symbol){
     if (stack->first_elem == NULL) return -1;
     Node* elem = stack->first_elem;
     *symbol = elem->symbol;
@@ -36,7 +36,7 @@ int pop(stack_t* stack, char* symbol){
     free(elem);
     return 0;
 }
-int push(stack_t* stack, char symbol){
+int push(stack_t* stack, char* symbol){
     Node* elem = malloc(sizeof(Node));
     Node* prev = stack->first_elem;
     stack->first_elem = elem;
@@ -44,9 +44,9 @@ int push(stack_t* stack, char symbol){
     elem->symbol = symbol;
     return 0;
 }
-char check_stack(stack_t* stack){
+char* check_stack(stack_t* stack){
     if (stack->first_elem != NULL){
         return stack->first_elem->symbol;
     }
-    return EOF;
+    return NULL;
 }

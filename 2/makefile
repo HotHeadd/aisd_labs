@@ -1,6 +1,6 @@
 TARGET = app
 LIBNAME = my
-ENDFLAGS = -lm -lreadline
+ENDFLAGS = -lm -lreadline -g
 CC = gcc
 
 LIB_LOCATION = ./library
@@ -12,32 +12,32 @@ PROJ_OBJ = ./obj/
 
 stack = V # Vect List
 lib = S # Static Dynamic
-# LD default
+# VS default
 
-ifeq ($(stack), V)
-	LIBSOURCE = stack_vector
-	LIBNAME = vector
-else
+ifeq ($(stack), L)
 	LIBSOURCE = stack_LList
 	LIBNAME = list
-endif
-ifeq ($(lib), S)
-	CFLAGS = -c
-	LMAKE = ar r
-	FORMAT = a
-	ENDCOMP = 
 else
+	LIBSOURCE = stack_vector
+	LIBNAME = vector
+endif
+ifeq ($(lib), D)
 	CFLAGS = -c -fPIC
 	LEFT = $(CC) -shared -o
 	FORMAT = so
 	ENDCOMP = -Wl,-rpath,$(LIB_LOCATION)
+else
+	CFLAGS = -c
+	LEFT = ar r
+	FORMAT = a
+	ENDCOMP = 
 endif
 
 SRC = $(wildcard $(PROJ_SRC)*.c) # все файлы проекта с исходным кодом
 OBJ = $(patsubst $(PROJ_SRC)%.c, $(PROJ_OBJ)%.o, $(SRC)) # переделываем их на объектные файлы, меняем директорию
 
 $(TARGET): lib $(OBJ) # И ТУТ МЕНЯЛ
-	$(CC) -o $(TARGET) $(PROJ_OBJ)*.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP)
+	$(CC) -o $(TARGET) $(PROJ_OBJ)*.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
 # СПРОСИ ПОЧЕМУ БИБЛИОТЕКА КАЖДЫЙ РАЗ ЗАНОВО СОБИРАЕТСЯ, ДАЖЕ ЕСЛИ СДЕЛАТЬ ПРАВИЛЬНО
 # $(LIB_LOCATION)/lib$(LIBNAME).$(FORMAT) : lib
@@ -45,21 +45,21 @@ $(TARGET): lib $(OBJ) # И ТУТ МЕНЯЛ
 $(PROJ_OBJ)%.o : $(PROJ_SRC)%.c
 	$(CC) -c $< -o $@ $(ENDFLAGS)
 
-lib: # ГИТ НЕ СИНХРОНИЗИРУЕТ ПУСТЫЕ ДИРЕКТОРИИ, ПОЭТОМУ ДОБАВИЛ ГЕНЕРАЦИЮ OBJ-ДИРЕКТОРИЙ
+lib:
 	mkdir $(PROJ_OBJ) || true
 	mkdir $(LIB_PREF_OBJ) || true
-	$(CC) $(CFLAGS) $(LIB_PREF_SRC)basic.c -o $(LIB_PREF_OBJ)basic.o
-	$(CC) $(CFLAGS) $(LIB_PREF_SRC)$(LIBSOURCE).c -o $(LIB_PREF_OBJ)$(LIBSOURCE).o
+	$(CC) $(CFLAGS) $(LIB_PREF_SRC)basic.c -o $(LIB_PREF_OBJ)basic.o $(ENDFLAGS)
+	$(CC) $(CFLAGS) $(LIB_PREF_SRC)$(LIBSOURCE).c -o $(LIB_PREF_OBJ)$(LIBSOURCE).o $(ENDFLAGS)
 	$(LEFT) $(LIB_LOCATION)/lib$(LIBNAME).$(FORMAT) $(LIB_PREF_OBJ)*.o
 
-clean: # КАК НЕ ВЫВОДИТЬ ОШИБКИ RM-a???
-	@rm $(LIB_LOCATION)/libvector.a || true
-	@rm $(LIB_LOCATION)/libvector.so || true
-	@rm $(LIB_LOCATION)/liblist.so || true
-	@rm $(LIB_LOCATION)/liblist.a || true
-	@rm $(PROJ_OBJ)*.o $(TARGET) || true
-	@rm vgcore* || true
-	@rm ./obj/*.o || true
-	@rm $(LIB_LOCATION)/obj/*.o || true
-	@rmdir obj ./library/obj
+clean:
+	@rm -f $(LIB_LOCATION)/libvector.a || true
+	@rm -f $(LIB_LOCATION)/libvector.so || true
+	@rm -f $(LIB_LOCATION)/liblist.so || true
+	@rm -f $(LIB_LOCATION)/liblist.a || true
+	@rm -f $(PROJ_OBJ)*.o $(TARGET) || true
+	@rm -f vgcore* || true
+	@rm -f ./obj/*.o || true
+	@rm -f $(LIB_LOCATION)/obj/*.o || true
+	@rm -f -d obj ./library/obj
 	

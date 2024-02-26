@@ -3,9 +3,8 @@
 typedef struct stack_t stack_t;
 
 stack_t* get_stack();
-void print_stack(stack_t* stack);
 void free_stack(stack_t*);
 
-int pop(stack_t*, char*);
-int push(stack_t*, char);
-char check_stack(stack_t* stack);
+int pop(stack_t*, char**);
+int push(stack_t*, char*);
+char* check_stack(stack_t* stack);

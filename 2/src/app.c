@@ -17,96 +17,77 @@ int check_symbol(char s){
             || (s == '+') || (s == '-') || (s == '*') || (s == '/');
 }
 
-int fill_stack(stack_t* stack){ // отмечены места для вывода стека на экран
-    char symbol;
+
+int process(stack_t* stack, char** result){
+    char* symbol = calloc(2, sizeof(char));
+    char* left, *right, *final;
     int res;
-    int count=1;//
-    char* printable = NULL;//
     printf("Введите формулу в постфиксной нотации\n-> ");
-    while ((symbol = getchar()) != '\n'){
-        if (symbol == EOF) return -1;
-        if ((symbol == ' ') || (symbol == '\t')) continue;
-        if (check_symbol(symbol) == 0) return 1;
-        count++;//
-        printable = realloc(printable, count*sizeof(char));//
-        printable[count-2] = symbol;//
-        res = push(stack, symbol);
-        if (res) {
-            free(printable);//
-            return 2;
+    while ((symbol[0] = getchar()) != '\n'){
+        if (symbol[0] == EOF) return -1;
+        if ((symbol[0] == ' ') || (symbol[0] == '\t')) continue;
+        if (check_symbol(symbol[0]) == 0){
+            clean_buff();
+            return 1;
         }
+        if (isznak(symbol[0]) == 0){
+            res = push(stack, symbol);
+            if (res == 1) {
+                clean_buff();
+                return 2;
+            }
+        }
+        else{
+            res = pop(stack, &right);
+            if (res == -1) return 3;
+            res = pop(stack, &left);
+            if (res == -1) return 3;
+            final = calloc(2+strlen(left)+strlen(right)+2, sizeof(char));
+            strcat(final, "(");
+            strcat(final, left);
+            strcat(final, symbol);
+            strcat(final, right);
+            strcat(final, ")");
+            push(stack, final);
+            free(left);
+            free(right);
+            free(symbol);
+        }
+        symbol = calloc(2, sizeof(char));
     }
-    printable[count-1] = '\0';//
-    printf("Введенная фомула (постфиксная нотация):\n");//
-    printf("\"%s\"\n", printable);//
-    free(printable);
+    pop(stack, &left);
+    if (check_stack(stack) != NULL){
+        while (pop(stack, &right) != -1) free(right);
+        free(left);
+        return 3;
+    }
+    else *result = left;
+    free(symbol);
     return 0;
 }
 
-char* read_stack(stack_t* stack){
-    int res;
-    char symbol;
-    char* result;
-    char* left;
-    char* right;
-    char* sred;
-    res = pop(stack, &symbol);
-    if (res == -1) return "Wrong";
-    sred = calloc(2, sizeof(char));
-    sred[0] = symbol;
-    if (isznak(symbol) == 0) return sred;
-    left = read_stack(stack);
-    if (left == "Wrong"){
-        free(sred);
-        free(left);
-        return "Wrong";
-    }
-    right = read_stack(stack);
-    if (right == "Wrong"){
-        free(result);
-        return "Wrong";
-    }
-    result = calloc(1+strlen(left)+1+strlen(right)+2, sizeof(char));
-    result[0] = '(';
-    strcat(result, right);
-    strcat(result, sred);
-    strcat(result, left);
-    strcat(result, ")");
-    free(left);
-    free(right);
-    free(sred);
-    return result;
-}
-
 int main(){
-    int res=0, size;
-    char* result;
+    int res=0;
+    char* result=NULL;
     stack_t* stack = get_stack();
     if (stack == NULL) return 0;
-    while ((res = fill_stack(stack)) != -1){
-        // обработка ввода и ошибок
+    while ((res = process(stack, &result)) != -1){
         if (res > 0){
             if (res == 1) printf("Ошибка формата ввода\n");
             if (res == 2) printf("Стек слишком маленький\n");
-            clean_buff();
+            if (res == 3) printf("Вы ввели невозможную формулу!\n");
         }
         else{
-            // вывод
-            result = read_stack(stack);
-            if ((result == "Wrong") || (check_stack(stack) != EOF)){
-                printf("Вы ввели невозможную формулу!\n");
-            }
-            else{
-                printf("Формула в инфиксном представлении:\n");
-                printf("%s\n", result);
-            }
-            if (result != "Wrong") free(result);
+            printf("Формула в инфиксном представлении:\n");
+            printf("%s\n", result);
         }
+        free(result);
+        result = NULL;
         free_stack(stack);
         stack = get_stack();
         if (stack == NULL) break;
     }
+    free_stack(stack);
     printf("Выхожу...\n");
-    if (stack != NULL) free_stack(stack);
     return 0;
 }
