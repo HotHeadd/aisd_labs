@@ -17,31 +17,44 @@ int check_symbol(char s){
             || (s == '+') || (s == '-') || (s == '*') || (s == '/');
 }
 
+int eXXit(int mistake, stack_t* stack, char* symbol){
+    char* topop;
+    if ((mistake > 0) && (mistake < 4)) clean_buff();
+    free(symbol);
+    while (pop(stack, &topop) != -1) free(topop);
+    return mistake;
+
+}
 
 int process(stack_t* stack, char** result){
     char* symbol = calloc(2, sizeof(char));
-    char* left, *right, *final;
+    char* left, *right, *final=NULL;
     int res;
     printf("Введите формулу в постфиксной нотации\n-> ");
     while ((symbol[0] = getchar()) != '\n'){
-        if (symbol[0] == EOF) return -1;
+        if (symbol[0] == EOF) {
+            return eXXit(-1, stack, symbol);
+        }
         if ((symbol[0] == ' ') || (symbol[0] == '\t')) continue;
         if (check_symbol(symbol[0]) == 0){
-            clean_buff();
-            return 1;
+            return eXXit(1, stack, symbol);
         }
         if (isznak(symbol[0]) == 0){
             res = push(stack, symbol);
             if (res == 1) {
-                clean_buff();
-                return 2;
+                return eXXit(2, stack, symbol);
             }
         }
         else{
             res = pop(stack, &right);
-            if (res == -1) return 3;
+            if (res == -1){
+                return eXXit(3, stack, symbol);
+            }
             res = pop(stack, &left);
-            if (res == -1) return 3;
+            if (res == -1){
+                free(right);
+                return eXXit(3, stack, symbol);
+            }
             final = calloc(2+strlen(left)+strlen(right)+2, sizeof(char));
             strcat(final, "(");
             strcat(final, left);
@@ -55,15 +68,17 @@ int process(stack_t* stack, char** result){
         }
         symbol = calloc(2, sizeof(char));
     }
-    pop(stack, &left);
-    if (check_stack(stack) != NULL){
-        while (pop(stack, &right) != -1) free(right);
+    res = pop(stack, &left);
+    if (res == -1){
+        *result = calloc(1, sizeof(char));
+        return eXXit(0, stack, symbol);
+    }
+    if (check_stack(stack) != NULL){    
         free(left);
-        return 3;
+        return eXXit(4, stack, symbol);
     }
     else *result = left;
-    free(symbol);
-    return 0;
+    return eXXit(0, stack, symbol);
 }
 
 int main(){
@@ -75,7 +90,7 @@ int main(){
         if (res > 0){
             if (res == 1) printf("Ошибка формата ввода\n");
             if (res == 2) printf("Стек слишком маленький\n");
-            if (res == 3) printf("Вы ввели невозможную формулу!\n");
+            if (res > 2) printf("Вы ввели невозможную формулу!\n");
         }
         else{
             printf("Формула в инфиксном представлении:\n");

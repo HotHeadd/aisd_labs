@@ -44,6 +44,12 @@ char* check_stack(stack_t* stack){
 }
 
 void free_stack(stack_t* stack){
-    if (stack != NULL) free(stack->elements);
+    char* fred;
+    if (stack != NULL){
+        if (stack->elements != 0){
+            while (pop(stack, &fred) != -1) free(fred);
+        }
+        free(stack->elements);
+    }
     free(stack);
 }
