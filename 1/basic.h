@@ -1,8 +1,5 @@
 #pragma once
-<<<<<<<< HEAD:start_folder/basic.h
 
-========
->>>>>>>> origin/n1-lab:lab_1/basic.h
 int o_n_and_0(double);
 int always_false(double);
 int only_negative(double);
