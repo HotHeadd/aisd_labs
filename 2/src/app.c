@@ -4,6 +4,13 @@
 #include "../library/src/stacklib.h"
 #include "../library/src/basic.h"
 
+#define GOOD 0
+#define FORMAT_ERROR 1
+#define STACK_OVERFLOW 2
+#define IMPOSSIBLE 3
+#define HUGO_FORMULA 4
+#define END_INPUT -1
+
 void clean_buff(){
     while (getchar() != '\n');
 }
@@ -33,27 +40,27 @@ int process(stack_t* stack, char** result){
     printf("Введите формулу в постфиксной нотации\n-> ");
     while ((symbol[0] = getchar()) != '\n'){
         if (symbol[0] == EOF) {
-            return eXXit(-1, stack, symbol);
+            return eXXit(END_INPUT, stack, symbol);
         }
         if ((symbol[0] == ' ') || (symbol[0] == '\t')) continue;
         if (check_symbol(symbol[0]) == 0){
-            return eXXit(1, stack, symbol);
+            return eXXit(FORMAT_ERROR, stack, symbol);
         }
         if (isznak(symbol[0]) == 0){
             res = push(stack, symbol);
             if (res == 1) {
-                return eXXit(2, stack, symbol);
+                return eXXit(STACK_OVERFLOW, stack, symbol);
             }
         }
         else{
             res = pop(stack, &right);
             if (res == -1){
-                return eXXit(3, stack, symbol);
+                return eXXit(IMPOSSIBLE, stack, symbol);
             }
             res = pop(stack, &left);
             if (res == -1){
                 free(right);
-                return eXXit(3, stack, symbol);
+                return eXXit(IMPOSSIBLE, stack, symbol);
             }
             final = calloc(2+strlen(left)+strlen(right)+2, sizeof(char));
             strcat(final, "(");
@@ -71,14 +78,14 @@ int process(stack_t* stack, char** result){
     res = pop(stack, &left);
     if (res == -1){
         *result = calloc(1, sizeof(char));
-        return eXXit(0, stack, symbol);
+        return eXXit(GOOD, stack, symbol);
     }
     if (check_stack(stack) != NULL){    
         free(left);
-        return eXXit(4, stack, symbol);
+        return eXXit(HUGO_FORMULA, stack, symbol);
     }
     else *result = left;
-    return eXXit(0, stack, symbol);
+    return eXXit(GOOD, stack, symbol);
 }
 
 int main(){
@@ -88,9 +95,11 @@ int main(){
     if (stack == NULL) return 0;
     while ((res = process(stack, &result)) != -1){
         if (res > 0){
-            if (res == 1) printf("Ошибка формата ввода\n");
-            if (res == 2) printf("Стек слишком маленький\n");
-            if (res > 2) printf("Вы ввели невозможную формулу!\n");
+            if (res == FORMAT_ERROR) printf("Ошибка формата ввода\n");
+            if (res == STACK_OVERFLOW) printf("Стек слишком маленький\n");
+            if ((res == IMPOSSIBLE) || (res == HUGO_FORMULA)){
+                printf("Вы ввели невозможную формулу!\n");
+            }
         }
         else{
             printf("Формула в инфиксном представлении:\n");
