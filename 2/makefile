@@ -39,13 +39,10 @@ OBJ = $(patsubst $(PROJ_SRC)%.c, $(PROJ_OBJ)%.o, $(SRC)) # переделыва�
 $(TARGET): lib $(OBJ) # И ТУТ МЕНЯЛ
 	$(CC) -o $(TARGET) $(PROJ_OBJ)*.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
-# СПРОСИ ПОЧЕМУ БИБЛИОТЕКА КАЖДЫЙ РАЗ ЗАНОВО СОБИРАЕТСЯ, ДАЖЕ ЕСЛИ СДЕЛАТЬ ПРАВИЛЬНО
-# $(LIB_LOCATION)/lib$(LIBNAME).$(FORMAT) : lib
-
 $(PROJ_OBJ)%.o : $(PROJ_SRC)%.c
 	$(CC) -c $< -o $@ $(ENDFLAGS)
 
-lib:
+lib: clean
 	mkdir $(PROJ_OBJ) || true
 	mkdir $(LIB_PREF_OBJ) || true
 	$(CC) $(CFLAGS) $(LIB_PREF_SRC)basic.c -o $(LIB_PREF_OBJ)basic.o $(ENDFLAGS)
