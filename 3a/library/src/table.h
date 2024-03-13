@@ -1,5 +1,12 @@
 #pragma once
 
+#define GOOD 0
+#define KEY_EXIST 1
+#define TABLE_OVERFLOW 2
+#define IMPOSSIBLE 3
+#define HUGO_FORMULA 4
+#define END_INPUT -1
+
 typedef struct KeySpace {
     // ключ элемента
     unsigned int key;
@@ -23,3 +30,4 @@ void display(table_t* table);
 int insert(table_t* table, char* info, unsigned int key);
 table_t* get_table();
 void free_table(table_t*);
+char* find(table_t*, unsigned int);

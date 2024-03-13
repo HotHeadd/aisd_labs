@@ -3,13 +3,6 @@
 #include <stdlib.h>
 #include "table.h"
 
-#define GOOD 0
-#define FORMAT_ERROR 1
-#define TABLE_OVERFLOW 2
-#define IMPOSSIBLE 3
-#define HUGO_FORMULA 4
-#define END_INPUT -1
-
 // ВСЕ ДИАЛОГИ В ПРИКОЛАДНОЙ ПРОГЕ (диалог только для вывода в файл)
 
 // инициализация
@@ -39,24 +32,29 @@ void free_table(table_t* table){
 // from lab 5 sem 1
 int binsearch\
 (void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*)){
-	int left = 0, right = amount, res, index;
+	int left = 0, right = amount, res, index=0;
 	void* element = data;
 	while (left+1 < right){
 		index = (left+right) / 2;
 		element = data + index*size;
 		res = copmarator(element, inserted);
-		if (res == 0) return index;
+		if (res == 0) return (-1)*index - 1;
 		if (res > 0) right = index;
 		else left = index;
 	}
 	element = data + left*size;
 	res = copmarator(element, inserted);
 	if (res > 0) return left;
+    if (res == 0) return (-1)*left - 1;
 	return right;
 }
 
-int compare(const KeySpace* a, const KeySpace* b){
+int compare_ins(const KeySpace* a, const KeySpace* b){
     return (a->key - b->key);
+}
+
+int compare_find(const KeySpace* a, const int* b){
+    return (a->key - *b);
 }
 
 int ins_elem(table_t* table, KeySpace elem, int index){
@@ -69,18 +67,33 @@ int ins_elem(table_t* table, KeySpace elem, int index){
 }
 
 int insert(table_t* table, char* info, unsigned int key){
-    if (table->msize == table->csize) return TABLE_OVERFLOW;
+    if (table->msize == table->csize){
+        free(info);
+        return TABLE_OVERFLOW;
+    }
     KeySpace elem;
     elem.key = key;
     elem.info = info;
     int index = binsearch\
-    (table->ks, &elem, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare);
+    (table->ks, &elem, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_ins);
+    if (index < 0){
+        free(info);
+        return KEY_EXIST;
+    }
     ins_elem(table, elem, index);
     table->csize += 1;
     return GOOD;
 }
 // удаление
-// поиск по ключу (В таблице не может быть двух элементов с одинаковыми значениями ключей.) 
+// поиск по ключу (В таблице не может быть двух элементов с одинаковыми значениями ключей.)
+
+char* find(table_t *table, unsigned int key){ // переделать так, чтобы возвращалась таблица
+    int res = binsearch\
+    (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_find);
+    if (res >= 0) return NULL;
+    res = (-1)*(res+1);
+    return (table->ks+res)->info;
+}
 // вывод таблицы в поток
 void display(table_t* table){
     printf("Здравствуйте, ваша таблица:\n");
