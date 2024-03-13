@@ -1,45 +1,93 @@
 #include "basic.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include "table.h"
 
 #define GOOD 0
 #define FORMAT_ERROR 1
-#define STACK_OVERFLOW 2
+#define TABLE_OVERFLOW 2
 #define IMPOSSIBLE 3
 #define HUGO_FORMULA 4
 #define END_INPUT -1
 
-typedef struct KeySpace {
-    // ключ элемента
-    unsigned int key;
-    // указатель на информацию
-    char **info;
-} KeySpace;
-
-typedef struct Table {
-    // указатель на пространство ключей
-    KeySpace *ks;
-    // размер области пространства ключей
-    int msize; //указать при инициализации
-} Table;
-
 // ВСЕ ДИАЛОГИ В ПРИКОЛАДНОЙ ПРОГЕ (диалог только для вывода в файл)
 
 // инициализация
-Table* get_table(){
-    Table* table = calloc(1, sizeof(Table));
+table_t* get_table(){
+    table_t* table = calloc(1, sizeof(table_t));
+    printf("Введите размер таблицы: ");
     int res = custom_int_input(&(table->msize), o_n_and_0);
-    if (res == -1) return NULL;
+    if (res == -1){
+        free(table);
+        return NULL;
+    }
     table->ks = calloc(table->msize, sizeof(KeySpace));
+    table->csize = 0;
     return table;
 }
+
+// очистка
+void free_table(table_t* table){
+    for (int i=0; i<(table->csize); i++){
+        free((table->ks+i)->info);
+    }
+    table->csize = 0;
+}
+
 // вставка
-int insert(Table table, char* elem){
-    
+
+// from lab 5 sem 1
+int binsearch\
+(void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*)){
+	int left = 0, right = amount, res, index;
+	void* element = data;
+	while (left+1 < right){
+		index = (left+right) / 2;
+		element = data + index*size;
+		res = copmarator(element, inserted);
+		if (res == 0) return index;
+		if (res > 0) right = index;
+		else left = index;
+	}
+	element = data + left*size;
+	res = copmarator(element, inserted);
+	if (res > 0) return left;
+	return right;
+}
+
+int compare(const KeySpace* a, const KeySpace* b){
+    return (a->key - b->key);
+}
+
+int ins_elem(table_t* table, KeySpace elem, int index){
+    KeySpace* mass = table->ks;
+    for (int i=table->csize; i>index;i--){
+        mass[i] = mass[i-1];
+    }
+    mass[index] = elem;
+    return GOOD;
+}
+
+int insert(table_t* table, char* info, unsigned int key){
+    if (table->msize == table->csize) return TABLE_OVERFLOW;
+    KeySpace elem;
+    elem.key = key;
+    elem.info = info;
+    int index = binsearch\
+    (table->ks, &elem, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare);
+    ins_elem(table, elem, index);
+    table->csize += 1;
     return GOOD;
 }
 // удаление
 // поиск по ключу (В таблице не может быть двух элементов с одинаковыми значениями ключей.) 
 // вывод таблицы в поток
+void display(table_t* table){
+    printf("Здравствуйте, ваша таблица:\n");
+    for (int i=0; i<(table->csize); i++){
+        printf("%u %s\n", (table->ks + i)->key, (table->ks)[i].info);
+    }
+}
 // импорт таблицы из текстового
 
 // индивид таск

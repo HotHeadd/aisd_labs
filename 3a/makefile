@@ -10,16 +10,16 @@ LIB_PREF_OBJ = $(LIB_LOCATION)/obj/
 PROJ_SRC = ./src/
 PROJ_OBJ = ./obj/
 
-stack = V # Vect List
+stack = D # Default Iteratirs
 lib = S # Static Dynamic
-# VS default
+# DS default
 
 ifeq ($(stack), L)
-	LIBSOURCE = stack_LList
-	LIBNAME = list
+	LIBSOURCE = table
+	LIBNAME = table
 else
-	LIBSOURCE = stack_vector
-	LIBNAME = vector
+	LIBSOURCE = table
+	LIBNAME = table
 endif
 ifeq ($(lib), D)
 	CFLAGS = -c -fPIC
@@ -50,10 +50,7 @@ lib: clean
 	$(LEFT) $(LIB_LOCATION)/lib$(LIBNAME).$(FORMAT) $(LIB_PREF_OBJ)*.o
 
 clean:
-	@rm -f $(LIB_LOCATION)/libvector.a || true
-	@rm -f $(LIB_LOCATION)/libvector.so || true
-	@rm -f $(LIB_LOCATION)/liblist.so || true
-	@rm -f $(LIB_LOCATION)/liblist.a || true
+	@rm -f $(LIB_LOCATION)/libtable.a || true
 	@rm -f $(PROJ_OBJ)*.o $(TARGET) || true
 	@rm -f vgcore* || true
 	@rm -f ./obj/*.o || true

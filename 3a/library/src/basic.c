@@ -74,7 +74,8 @@ char better_getchar(){
 		if (retu==-1) return EOF;
 		while (tras != '\n') scanf("%c", &tras);
 		printf("Please, try again: ");
-		buk = getchar(); tras = getchar();
+		buk = getchar();
+		tras = getchar();
 	}
 	return buk;
 }
