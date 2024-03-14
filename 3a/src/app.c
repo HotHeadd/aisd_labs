@@ -90,7 +90,10 @@ int main(){
                 if (res == -1) return eXXit(GOOD, table, filename);
                 ret = find(table, key);
                 if (ret == NULL) printf("Элемент не найден.\n");
-                else print_found(ret);
+                else {
+                    print_found(ret);
+                    free_elem(ret);
+                }
                 break;
             case '6':
                 free(filename);
@@ -108,7 +111,7 @@ int main(){
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
                 else if (res == FORMAT_ERROR)
                 {
-                    printf("Ошибка файла\n");
+                    printf("Ошибка формата данных\n");
                 }
                 else printf("Таблица записана\n");
                 break;

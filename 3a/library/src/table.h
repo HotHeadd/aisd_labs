@@ -33,6 +33,7 @@ table_t* get_table(int size);
 void free_table(table_t*);
 KeySpace* find(table_t*, unsigned int);
 void print_found(KeySpace*);
+void free_elem(KeySpace* elem);
 int delete(table_t*, unsigned int);
 
 int to_text(table_t* table, char*);

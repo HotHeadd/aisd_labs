@@ -100,17 +100,29 @@ int delete(table_t* table, unsigned int key){
 
 // поиск по ключу (В таблице не может быть двух элементов с одинаковыми значениями ключей.)
 
-KeySpace* find(table_t *table, unsigned int key){ // переделать так, чтобы возвращалась таблица
+KeySpace* copy_elem(KeySpace* elem){
+    KeySpace* copy = calloc(1, sizeof(KeySpace));
+    copy->key = elem->key;
+    copy->info = strdup(elem->info);
+    return copy;
+}
+
+KeySpace* find(table_t *table, unsigned int key){
     int res = binsearch\
     (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
     if (res >= 0) return NULL;
     res = (-1)*(res+1);
-    // copy?
-    return (table->ks+res);
+    KeySpace* copy = copy_elem(table->ks+res);
+    return copy;
 }
 
 void print_found(KeySpace* elem){
-    printf("Найденный элемент: %u %s\n", elem->key, elem->info);
+    printf("Найденный элемент: %u \"%s\"\n", elem->key, elem->info);
+}
+
+void free_elem(KeySpace* elem){
+    free(elem->info);
+    free(elem);
 }
 
 // вывод таблицы в поток
@@ -183,13 +195,21 @@ int from_text(table_t** table, char* filename){
     }
     for (int i=0;i<(*table)->csize;i++){
         res = fscanf(input, "%u%*c", &(((*table)->ks+i)->key));
-        if (res != 1){
-            (*table)->csize = 0;
+        if ((res != 1)||((i!=0) && (((*table)->ks+i)->key < ((*table)->ks+i-1)->key))){
+            (*table)->csize = i;
             free_table(*table);
             *table = NULL;
             return FORMAT_ERROR;
         }
         ((*table)->ks+i)->info = file_readline(input);
+        if (((*table)->ks+i)->info == "NULL"){
+            if (res != 1){
+                (*table)->csize = i;
+                free_table(*table);
+                *table = NULL;
+                return FORMAT_ERROR;
+            }
+        }
     }
     char b;
     if (fscanf(input, "%c", &b) == 1){
@@ -215,13 +235,58 @@ int delete_interval(table_t* table, int highest, int lowest){
 
 // ДОП
 
+typedef struct iterator_t{
+    table_t* table;
+    KeySpace* current;
+    int index;
+} iterator_t;
+
 // СОЗДАТЬ ИТЕРАТОР (ТИП ДАННЫХ)
-// создание итератора
-// удаление итератора
+// создание итератора 
+
+iterator_t* get_iter(table_t* table){
+    iterator_t* iter = calloc(1, sizeof(iterator_t));
+    iter->table = table;
+    return iter;
+}
+
+// удаление итератора ??
 // сравнение итераторов (1 если указывают на один элемент, 0 если нет)
+
+int iter_compare(iterator_t* first, iterator_t* second){
+    return (first->table == second->table) && (first->index == second->index);
+}
+
 // получение итератора, указ на первый элем. таблицы
+
+iterator_t* begin(table_t* table){
+    iterator_t* iter = get_iter(table);
+    iter->index = 0;
+    iter->current = table->ks;
+    return iter;
+}
+
 // получение итератора, указ на следующий элем. таблицы
+
+#define EOT 10
+
+int next(iterator_t* iter){
+    if ((iter->table->csize) == (iter->index)){
+        return EOT;
+    }
+    iter->index += 1;
+    iter->current += 1;
+    return GOOD;
+}
+
 // получение итератора, указ на последний элем. таблицы
+
+iterator_t* end(table_t* table){
+    iterator_t* iter = get_iter(table);
+    iter->index = table->csize;
+    iter->current = table->ks+table->csize-1;
+    return iter;
+}
 
 // СОЗЖАТЬ ВТОРОЙ НАБОР ФУНКЦИЙ ДЛЯ ТАБЛИЦЫ
 // вставка возвращает итератор, указывающий на вставленный элемент
