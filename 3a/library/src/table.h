@@ -3,8 +3,8 @@
 #define GOOD 0
 #define KEY_EXIST 1
 #define TABLE_OVERFLOW 2
-#define IMPOSSIBLE 3
-#define HUGO_FORMULA 4
+#define ELEM_NOT_FOUND 3
+#define FILE_ERROR 4
 #define END_INPUT -1
 
 typedef struct KeySpace {
@@ -28,6 +28,11 @@ int binsearch\
 (void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*));
 void display(table_t* table);
 int insert(table_t* table, char* info, unsigned int key);
-table_t* get_table();
+table_t* get_table(int size);
 void free_table(table_t*);
-char* find(table_t*, unsigned int);
+KeySpace* find(table_t*, unsigned int);
+void print_found(KeySpace*);
+int delete(table_t*, unsigned int);
+
+int to_text(table_t* table, char*);
+int from_text(table_t** table, char* filename);

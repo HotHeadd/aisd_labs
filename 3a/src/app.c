@@ -8,11 +8,10 @@ void clean_buff(){
     while (getchar() != '\n');
 }
 
-int eXXit(int mistake, table_t* table){
+int eXXit(int mistake, table_t* table, char* filename){
     printf("Выхожу...\n");
     free_table(table);
-    free(table->ks);
-    free(table);
+    free(filename);
     return mistake;
 
 }
@@ -21,11 +20,13 @@ int eXXit(int mistake, table_t* table){
 
 void menus(){
     printf("\nВыберете опцию\n");
-    printf("(1) Очистить эту таблицу\n");
+    printf("(1) Создать новую таблицу\n");
     printf("(2) Вывести таблицу\n");
     printf("(3) Вставить элемент в таблицу\n");
     printf("(4) Удалить элемент из таблицы\n");
     printf("(5) Найти элемент в таблице\n");
+    printf("(6) Записать таблицу в текстовый файл\n");
+    printf("(7) Получить таблицу из текстового файла\n");
     printf("--> ");
 }
 
@@ -47,43 +48,67 @@ int ask_key(unsigned int *key){
 
 int main(){
     char choice;
-    table_t* table = get_table();
-    if (table == NULL) return 0;
+    void* ret;
     unsigned int key;
     char* info;
     int res;
+    char* filename = NULL;
+    int size;
+    table_t* table = NULL;
     menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
                 free_table(table);
+                printf("Введите размер таблицы: ");
+                res = custom_int_input(&size, o_n_and_0);
+                if (res == -1){
+                    return 0;
+                }
+                table = get_table(size);
                 break;
             case '2':
                 display(table);
                 break;
             case '3':
                 res = ask_elem(&info, &key);
-                if (res == -1) return eXXit(GOOD, table);
+                if (res == -1) return eXXit(GOOD, table, filename);
                 res = insert(table, info, key);
                 if (res == KEY_EXIST) printf("Элемент с таким ключем уже есть!\n");
                 if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
                 break;
             case '4':
                 res = ask_key(&key);
-                if (res == -1) return eXXit(GOOD, table);
-                //delete
+                if (res == -1) return eXXit(GOOD, table, filename);
+                res = delete(table, key);
+                if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
+                else printf("Элемент удален.\n");
                 break;
             case '5':
                 res = ask_key(&key);
-                if (res == -1) return eXXit(GOOD, table);
-                info = find(table, key);
-                if (info == NULL) printf("Элемент не найден.\n");
-                else printf("Найденный элемент: \"%s\"\n", info);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                ret = find(table, key);
+                if (ret == NULL) printf("Элемент не найден.\n");
+                else print_found(ret);
+                break;
+            case '6':
+                filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
+                if (filename == NULL) return eXXit(GOOD, table, filename);
+                res = to_text(table, filename);
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
+                else printf("Таблица записана\n");
+                break;
+            case '7':
+                filename = readline("Введите имя файла, из кторого взять таблицу: ");
+                if (filename == NULL) return eXXit(GOOD, table, filename);
+                res = from_text(&table, filename);
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
+                else printf("Таблица записана\n");
                 break;
             default:
                 printf("NIECHEGO\n");
         }
         menus();
     }
-    return eXXit(GOOD, table);
+    return eXXit(GOOD, table, filename);
 }
