@@ -27,6 +27,7 @@ void menus(){
     printf("(5) Найти элемент в таблице\n");
     printf("(6) Записать таблицу в текстовый файл\n");
     printf("(7) Получить таблицу из текстового файла\n");
+    printf("(8) Индивидуальное задание (удалить элементы в диапозоне ключей\n");
     printf("--> ");
 }
 
@@ -92,6 +93,7 @@ int main(){
                 else print_found(ret);
                 break;
             case '6':
+                free(filename);
                 filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
                 res = to_text(table, filename);
@@ -99,11 +101,32 @@ int main(){
                 else printf("Таблица записана\n");
                 break;
             case '7':
+                free(filename);
                 filename = readline("Введите имя файла, из кторого взять таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
                 res = from_text(&table, filename);
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
+                else if (res == FORMAT_ERROR)
+                {
+                    printf("Ошибка файла\n");
+                }
                 else printf("Таблица записана\n");
+                break;
+            case '8':
+                int highest, lowest;
+                printf("Введите нижний ключ: ");
+                res = custom_int_input(&lowest, only_negative);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                printf("Введите верхний ключ: ");
+                res = custom_int_input(&highest, only_negative);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                while (highest < lowest){
+                    printf("Неправильный верхний ключ!\n");
+                    printf("Введите верхний ключ: ");
+                    res = custom_int_input(&highest, only_negative);
+                    if (res == -1) return eXXit(GOOD, table, filename);
+                }
+                delete_interval(table, highest, lowest);
                 break;
             default:
                 printf("NIECHEGO\n");

@@ -90,7 +90,6 @@ int delete(table_t* table, unsigned int key){
     (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
     if (res >= 0) return ELEM_NOT_FOUND;
     res = (-1)*(res+1);
-    printf("%d\n", res);
     free((table->ks+res)->info);
     for (int i=res; i<table->csize-1;i++){
         (table->ks)[i] = (table->ks)[i+1];
@@ -116,9 +115,13 @@ void print_found(KeySpace* elem){
 
 // вывод таблицы в поток
 void display(table_t* table){
+    if (table == NULL){
+        printf("Никакой таблицы нет");
+        return;
+    }
     printf("Здравствуйте, ваша таблица:\n");
     for (int i=0; i<(table->csize); i++){
-        printf("%u %s\n", (table->ks + i)->key, (table->ks)[i].info);
+        printf("%u \"%s\"\n", (table->ks + i)->key, (table->ks)[i].info);
     }
 }
 // импорт и экспорт таблицы из текстового
@@ -130,6 +133,7 @@ int to_text(table_t* table, char* filename){
     for (int i=0;i<table->csize; i++){
         fprintf(output, "%u\t%s\n", (table->ks+i)->key, (table->ks+i)->info);
     }
+    fclose(output);
     return GOOD;
 }
 
@@ -161,24 +165,53 @@ char* file_readline(FILE* file){ //переделанный для файлов 
 
 int from_text(table_t** table, char* filename){
     free_table(*table);
+    int res, size;
     FILE* input = fopen(filename, "r");
-    if (input == NULL) return FILE_ERROR;
-    int size;
+    if (input == NULL){
+        *table = NULL;
+        return FILE_ERROR;
+    }
     fscanf(input, "%d", &size);
     *table = get_table(size);
     fscanf(input, "%d%*c", &size);
     (*table)->csize = size;
-    for (int i=0;i<(*table)->csize;i++){
-        fscanf(input, "%u%*c", &(((*table)->ks+i)->key));
-        ((*table)->ks+i)->info = file_readline(input);
-        printf("%u \"%s\"\n", ((*table)->ks+i)->key, ((*table)->ks+i)->info);
+    if ((*table)->csize > (*table)->msize){
+        (*table)->csize = 0;
+        free_table(*table);
+        *table = NULL;
+        return FORMAT_ERROR;
     }
+    for (int i=0;i<(*table)->csize;i++){
+        res = fscanf(input, "%u%*c", &(((*table)->ks+i)->key));
+        if (res != 1){
+            (*table)->csize = 0;
+            free_table(*table);
+            *table = NULL;
+            return FORMAT_ERROR;
+        }
+        ((*table)->ks+i)->info = file_readline(input);
+    }
+    char b;
+    if (fscanf(input, "%c", &b) == 1){
+        (*table)->csize = 0;
+        free_table(*table);
+        *table = NULL;
+        return FORMAT_ERROR;
+    }
+    fclose(input);
     return GOOD;
 }
 
 // индивид таск
 // удаление из таблицы элементов, заданных диапазоном ключей; в таблице могут отсутствовать
 // элементы с ключами, задающими диапазон.
+
+int delete_interval(table_t* table, int highest, int lowest){
+    for (int i=lowest; i<=highest; i++){
+        delete(table, i);
+    }
+    return GOOD;
+}
 
 // ДОП
 

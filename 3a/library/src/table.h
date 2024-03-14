@@ -4,7 +4,8 @@
 #define KEY_EXIST 1
 #define TABLE_OVERFLOW 2
 #define ELEM_NOT_FOUND 3
-#define FILE_ERROR 4
+#define FILE_ERROR 4 
+#define FORMAT_ERROR 5
 #define END_INPUT -1
 
 typedef struct KeySpace {
@@ -36,3 +37,5 @@ int delete(table_t*, unsigned int);
 
 int to_text(table_t* table, char*);
 int from_text(table_t** table, char* filename);
+
+int delete_interval(table_t* table, int highest, int lowest);
