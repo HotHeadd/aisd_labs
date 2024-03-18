@@ -7,6 +7,7 @@
 #define FILE_ERROR 4 
 #define FORMAT_ERROR 5
 #define END_INPUT -1
+#define EOTABLE 10
 
 typedef struct KeySpace {
     // ключ элемента
@@ -25,6 +26,7 @@ typedef struct table_t {
 
 // typedef struct KeySpace KeySpace;
 // typedef struct table_t table_t;
+// TODO: CONST DATA TYPE WHERE REQUIRED
 int binsearch\
 (void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*));
 void display(table_t* table);

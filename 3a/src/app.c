@@ -57,6 +57,7 @@ int main(){
     int size;
     table_t* table = NULL;
     menus();
+    #ifdef MAIN_TASK
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
@@ -136,5 +137,86 @@ int main(){
         }
         menus();
     }
+    #elif DOP_TASK
+    while ((choice = better_getchar()) != EOF){
+        switch(choice){
+            case '1':
+                free_table(table);
+                printf("Введите размер таблицы: ");
+                res = custom_int_input(&size, o_n_and_0);
+                if (res == -1){
+                    return 0;
+                }
+                table = get_table(size);
+                break;
+            case '2':
+                display(table);
+                break;
+            case '3':
+                res = ask_elem(&info, &key);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                res = insert(table, info, key);
+                if (res == KEY_EXIST) printf("Элемент с таким ключем уже есть!\n");
+                if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
+                break;
+            case '4':
+                res = ask_key(&key);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                res = delete(table, key);
+                if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
+                else printf("Элемент удален.\n");
+                break;
+            case '5':
+                res = ask_key(&key);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                ret = find(table, key);
+                if (ret == NULL) printf("Элемент не найден.\n");
+                else {
+                    print_found(ret);
+                    free_elem(ret);
+                }
+                break;
+            case '6':
+                free(filename);
+                filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
+                if (filename == NULL) return eXXit(GOOD, table, filename);
+                res = to_text(table, filename);
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
+                else printf("Таблица записана\n");
+                break;
+            case '7':
+                free(filename);
+                filename = readline("Введите имя файла, из кторого взять таблицу: ");
+                if (filename == NULL) return eXXit(GOOD, table, filename);
+                res = from_text(&table, filename);
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
+                else if (res == FORMAT_ERROR)
+                {
+                    printf("Ошибка формата данных\n");
+                }
+                else printf("Таблица записана\n");
+                break;
+            case '8':
+                int highest, lowest;
+                printf("Введите нижний ключ: ");
+                res = custom_int_input(&lowest, only_negative);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                printf("Введите верхний ключ: ");
+                res = custom_int_input(&highest, only_negative);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                while (highest < lowest){
+                    printf("Неправильный верхний ключ!\n");
+                    printf("Введите верхний ключ: ");
+                    res = custom_int_input(&highest, only_negative);
+                    if (res == -1) return eXXit(GOOD, table, filename);
+                }
+                delete_interval(table, highest, lowest);
+                break;
+            default:
+                printf("NIECHEGO\n");
+        }
+        menus();
+    }
+    #endif
     return eXXit(GOOD, table, filename);
 }

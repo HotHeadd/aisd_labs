@@ -108,6 +108,7 @@ KeySpace* copy_elem(KeySpace* elem){
 }
 
 KeySpace* find(table_t *table, unsigned int key){
+    if (table == NULL) return NULL;
     int res = binsearch\
     (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
     if (res >= 0) return NULL;
@@ -236,9 +237,9 @@ int delete_interval(table_t* table, int highest, int lowest){
 // ДОП
 
 typedef struct iterator_t{
-    table_t* table;
+    table_t* table; //
     KeySpace* current;
-    int index;
+    int index; //
 } iterator_t;
 
 // СОЗДАТЬ ИТЕРАТОР (ТИП ДАННЫХ)
@@ -268,11 +269,9 @@ iterator_t* begin(table_t* table){
 
 // получение итератора, указ на следующий элем. таблицы
 
-#define EOT 10
-
 int next(iterator_t* iter){
     if ((iter->table->csize) == (iter->index)){
-        return EOT;
+        return EOTABLE;
     }
     iter->index += 1;
     iter->current += 1;

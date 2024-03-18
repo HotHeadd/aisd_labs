@@ -1,6 +1,6 @@
 TARGET = app
 LIBNAME = my
-ENDFLAGS = -lm -lreadline -g
+ENDFLAGS = -lm -lreadline -g -D $(KEYWORD)
 CC = gcc
 
 LIB_LOCATION = ./library
@@ -11,26 +11,24 @@ PROJ_SRC = ./src/
 PROJ_OBJ = ./obj/
 
 stack = D # Default Iteratirs
-lib = S # Static Dynamic
+task = M # Static Dynamic
 # DS default
 
-ifeq ($(stack), L)
+CFLAGS = -c
+LEFT = ar r
+FORMAT = a
+ENDCOMP = 
+
+CHOICE = B
+ifeq ($(CHOICE), M)
 	LIBSOURCE = table
 	LIBNAME = table
-else
-	LIBSOURCE = table
-	LIBNAME = table
+	KEYWORD = MAIN_TASK
 endif
-ifeq ($(lib), D)
-	CFLAGS = -c -fPIC
-	LEFT = $(CC) -shared -o
-	FORMAT = so
-	ENDCOMP = -Wl,-rpath,$(LIB_LOCATION)
-else
-	CFLAGS = -c
-	LEFT = ar r
-	FORMAT = a
-	ENDCOMP = 
+ifeq ($(CHOICE), D)
+	LIBSOURCE = table
+	LIBNAME = table
+	KEYWORD = DOP_TASK
 endif
 
 SRC = $(wildcard $(PROJ_SRC)*.c) # все файлы проекта с исходным кодом
