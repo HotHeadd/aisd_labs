@@ -7,6 +7,7 @@
 #define FILE_ERROR 4 
 #define FORMAT_ERROR 5
 #define END_INPUT -1
+#define NO_TABLE 6
 #define EOTABLE 10
 
 typedef struct KeySpace {
@@ -23,6 +24,10 @@ typedef struct table_t {
     int msize; //указать при инициализации
     int csize;
 } table_t;
+
+typedef struct iterator_t{
+    KeySpace* current;
+} iterator_t;
 
 // typedef struct KeySpace KeySpace;
 // typedef struct table_t table_t;
@@ -42,3 +47,9 @@ int to_text(table_t* table, char*);
 int from_text(table_t** table, char* filename);
 
 int delete_interval(table_t* table, int highest, int lowest);
+
+int iter_compare(iterator_t first, iterator_t second);
+iterator_t begin(table_t* table);
+iterator_t end(table_t* table);
+iterator_t next(iterator_t iter);
+iterator_t back(iterator_t iter);

@@ -19,7 +19,7 @@ LEFT = ar r
 FORMAT = a
 ENDCOMP = 
 
-CHOICE = B
+CHOICE = M
 ifeq ($(CHOICE), M)
 	LIBSOURCE = table
 	LIBNAME = table

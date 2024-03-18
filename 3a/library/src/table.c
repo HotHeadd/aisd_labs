@@ -26,9 +26,41 @@ void free_table(table_t* table){
     free(table);
 }
 
-// вставка
+// сравнение итераторов (1 если указывают на один элемент, 0 если нет)
+int iter_compare(iterator_t first, iterator_t second){
+    return first.current == second.current;
+}
 
-// from lab 5 sem 1
+// получение итератора, указ на первый элем. таблицы
+
+iterator_t begin(table_t* table){
+    iterator_t result = {result.current = table->ks};
+    return result;
+}
+
+// получение итератора, указ на последний элем. таблицы
+
+iterator_t end(table_t* table){
+    iterator_t result = {result.current = table->ks + table->csize};
+    return result;
+}
+
+// получение итератора, указ на следующий элем. таблицы
+
+iterator_t next(iterator_t iter){
+    iterator_t result = {result.current = iter.current + 1};
+    return result;
+}
+
+iterator_t back(iterator_t iter){
+    iterator_t result = {result.current = iter.current - 1};
+    return result;
+}
+
+char* value(iterator_t iter){
+    return (iter.current)->info;
+}
+
 int binsearch\
 (void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*)){
 	int left = 0, right = amount, res, index=0;
@@ -66,6 +98,7 @@ int ins_elem(table_t* table, KeySpace elem, int index){
 }
 
 int insert(table_t* table, char* info, unsigned int key){
+    if (table == NULL) return NO_TABLE;
     if (table->msize == table->csize){
         free(info);
         return TABLE_OVERFLOW;
@@ -125,7 +158,7 @@ void free_elem(KeySpace* elem){
     free(elem->info);
     free(elem);
 }
-
+#ifdef MAIN_TASK
 // вывод таблицы в поток
 void display(table_t* table){
     if (table == NULL){
@@ -137,6 +170,24 @@ void display(table_t* table){
         printf("%u \"%s\"\n", (table->ks + i)->key, (table->ks)[i].info);
     }
 }
+#elif DOP_TASK
+// СОЗЖАТЬ ВТОРОЙ НАБОР ФУНКЦИЙ ДЛЯ ТАБЛИЦЫ
+// Вывод при помощи итераторов
+void display(table_t* table){
+    if (table == NULL){
+        printf("Никакой таблицы нет");
+        return;
+    }
+    printf("Здравствуйте, ваша таблица:\n");
+    for (iterator_t i=begin(table); iter_compare(i, end(table)) == 0; i=next(i)){
+        printf("%u \"%s\"\n", (i.current)->key, value(i));
+    }
+}
+
+// вставка возвращает итератор, указывающий на вставленный элемент
+// Удаление возвращает итератор, который укаызывает на следующий после удаленного элемент
+// Поиск возвращает итератор на найденный элемент
+#endif
 // импорт и экспорт таблицы из текстового
 
 int to_text(table_t* table, char* filename){
@@ -233,63 +284,3 @@ int delete_interval(table_t* table, int highest, int lowest){
     }
     return GOOD;
 }
-
-// ДОП
-
-typedef struct iterator_t{
-    table_t* table; //
-    KeySpace* current;
-    int index; //
-} iterator_t;
-
-// СОЗДАТЬ ИТЕРАТОР (ТИП ДАННЫХ)
-// создание итератора 
-
-iterator_t* get_iter(table_t* table){
-    iterator_t* iter = calloc(1, sizeof(iterator_t));
-    iter->table = table;
-    return iter;
-}
-
-// удаление итератора ??
-// сравнение итераторов (1 если указывают на один элемент, 0 если нет)
-
-int iter_compare(iterator_t* first, iterator_t* second){
-    return (first->table == second->table) && (first->index == second->index);
-}
-
-// получение итератора, указ на первый элем. таблицы
-
-iterator_t* begin(table_t* table){
-    iterator_t* iter = get_iter(table);
-    iter->index = 0;
-    iter->current = table->ks;
-    return iter;
-}
-
-// получение итератора, указ на следующий элем. таблицы
-
-int next(iterator_t* iter){
-    if ((iter->table->csize) == (iter->index)){
-        return EOTABLE;
-    }
-    iter->index += 1;
-    iter->current += 1;
-    return GOOD;
-}
-
-// получение итератора, указ на последний элем. таблицы
-
-iterator_t* end(table_t* table){
-    iterator_t* iter = get_iter(table);
-    iter->index = table->csize;
-    iter->current = table->ks+table->csize-1;
-    return iter;
-}
-
-// СОЗЖАТЬ ВТОРОЙ НАБОР ФУНКЦИЙ ДЛЯ ТАБЛИЦЫ
-// вставка возвращает итератор, указывающий на вставленный элемент
-// Удаление возвращает итератор, который укаызывает на следующий после удаленного элемент
-// Поиск возвращает итератор на найденный элемент
-
-// Добавить в мейкфайл выбор реализации с итераторами и без

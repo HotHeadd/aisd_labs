@@ -76,6 +76,10 @@ int main(){
                 res = ask_elem(&info, &key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = insert(table, info, key);
+                if (res == NO_TABLE) {
+                    free(info);
+                    printf("Нет таблицы!!\n");
+                }
                 if (res == KEY_EXIST) printf("Элемент с таким ключем уже есть!\n");
                 if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
                 break;
