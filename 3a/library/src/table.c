@@ -57,12 +57,17 @@ iterator_t back(iterator_t iter){
     return result;
 }
 
-unsigned int key(iterator_t iter){
+unsigned int iter_key(iterator_t iter){
     return (iter.current)->key;
 }
 
-char* value(iterator_t iter){
+char* iter_value(iterator_t iter){
     return (iter.current)->info;
+}
+
+iterator_t null_iter(table_t* table){
+    iterator_t result = {result.current = NULL};
+    return result;
 }
 
 int binsearch\
@@ -135,6 +140,19 @@ int delete(table_t* table, unsigned int key){
     return GOOD;
 }
 
+
+#ifdef MAIN_TASK
+// вывод таблицы в поток
+void display(table_t* table){
+    if (table == NULL){
+        printf("Никакой таблицы нет");
+        return;
+    }
+    printf("Здравствуйте, ваша таблица:\n");
+    for (int i=0; i<(table->csize); i++){
+        printf("%u \"%s\"\n", (table->ks + i)->key, (table->ks)[i].info);
+    }
+}
 // поиск по ключу (В таблице не может быть двух элементов с одинаковыми значениями ключей.)
 
 KeySpace* copy_elem(KeySpace* elem){
@@ -162,18 +180,6 @@ void free_elem(KeySpace* elem){
     free(elem->info);
     free(elem);
 }
-#ifdef MAIN_TASK
-// вывод таблицы в поток
-void display(table_t* table){
-    if (table == NULL){
-        printf("Никакой таблицы нет");
-        return;
-    }
-    printf("Здравствуйте, ваша таблица:\n");
-    for (int i=0; i<(table->csize); i++){
-        printf("%u \"%s\"\n", (table->ks + i)->key, (table->ks)[i].info);
-    }
-}
 #elif DOP_TASK
 // СОЗЖАТЬ ВТОРОЙ НАБОР ФУНКЦИЙ ДЛЯ ТАБЛИЦЫ
 // Вывод при помощи итераторов
@@ -184,10 +190,24 @@ void display(table_t* table){
     }
     printf("Здравствуйте, ваша таблица:\n");
     for (iterator_t i=begin(table); iter_compare(i, end(table)) == 0; i=next(i)){
-        printf("%u \"%s\"\n", key(i), value(i));
+        printf("%u \"%s\"\n", iter_key(i), iter_value(i));
     }
 }
 
+iterator_t find(table_t *table, unsigned int key){
+    iterator_t result = null_iter(table);
+    for (iterator_t i = begin(table); iter_compare(i, end(table)) == 0; i = next(i)){
+        if (iter_key(i) == key){
+            result = i;
+            break;
+        }
+    }
+    return result;
+}
+
+void print_found(iterator_t iter){
+    printf("Найденный элемент: %u \"%s\"\n", iter_key(iter), iter_value(iter));
+}
 // вставка возвращает итератор, указывающий на вставленный элемент
 // Удаление возвращает итератор, который укаызывает на следующий после удаленного элемент
 // Поиск возвращает итератор на найденный элемент

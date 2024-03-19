@@ -173,11 +173,11 @@ int main(){
             case '5':
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                ret = find(table, key);
-                if (ret == NULL) printf("Элемент не найден.\n");
+                iterator_t iter;
+                iter = find(table, key);
+                if (iter_compare(iter, null_iter(table))) printf("Элемент не найден.\n");
                 else {
-                    print_found(ret);
-                    free_elem(ret);
+                    print_found(iter);
                 }
                 break;
             case '6':

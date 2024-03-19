@@ -38,9 +38,6 @@ void display(table_t* table);
 int insert(table_t* table, char* info, unsigned int key);
 table_t* get_table(int size);
 void free_table(table_t*);
-KeySpace* find(table_t*, unsigned int);
-void print_found(KeySpace*);
-void free_elem(KeySpace* elem);
 int delete(table_t*, unsigned int);
 
 int to_text(table_t* table, char*);
@@ -53,3 +50,15 @@ iterator_t begin(table_t* table);
 iterator_t end(table_t* table);
 iterator_t next(iterator_t iter);
 iterator_t back(iterator_t iter);
+iterator_t null_iter(table_t* table);
+unsigned int iter_key(iterator_t iter);
+char* iter_value(iterator_t iter);
+
+#ifdef MAIN_TASK
+KeySpace* find(table_t*, unsigned int);
+void print_found(KeySpace*);
+void free_elem(KeySpace* elem);
+#elif DOP_TASK
+iterator_t find(table_t *table, unsigned int key);
+void print_found(iterator_t iter);
+#endif
