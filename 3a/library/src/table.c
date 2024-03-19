@@ -57,6 +57,10 @@ iterator_t back(iterator_t iter){
     return result;
 }
 
+unsigned int key(iterator_t iter){
+    return (iter.current)->key;
+}
+
 char* value(iterator_t iter){
     return (iter.current)->info;
 }
@@ -180,7 +184,7 @@ void display(table_t* table){
     }
     printf("Здравствуйте, ваша таблица:\n");
     for (iterator_t i=begin(table); iter_compare(i, end(table)) == 0; i=next(i)){
-        printf("%u \"%s\"\n", (i.current)->key, value(i));
+        printf("%u \"%s\"\n", key(i), value(i));
     }
 }
 
