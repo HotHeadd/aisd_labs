@@ -33,7 +33,7 @@ void menus(){
 
 int ask_elem(char** info, unsigned int* key){
     printf("Введите ключ: ");
-    int res = custom_int_input(key, only_negative);
+    int res = custom_int_input(key, o_n_and_0);
     if (res == -1) return END_INPUT;
     *info = readline("Введите строку (значение): ");
     if (*info == NULL) return END_INPUT;
@@ -42,7 +42,7 @@ int ask_elem(char** info, unsigned int* key){
 
 int ask_key(unsigned int *key){
     printf("Введите значение ключа: ");
-    int res = custom_int_input(key, only_negative);
+    int res = custom_int_input(key, o_n_and_0);
     if (res == -1) return END_INPUT;
     return GOOD;
 }
@@ -76,10 +76,8 @@ int main(){
                 res = ask_elem(&info, &key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = insert(table, info, key);
-                if (res == NO_TABLE) {
-                    free(info);
-                    printf("Нет таблицы!!\n");
-                }
+                if (res != GOOD) free(info);
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
                 if (res == KEY_EXIST) printf("Элемент с таким ключем уже есть!\n");
                 if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
                 break;
@@ -142,6 +140,7 @@ int main(){
         menus();
     }
     #elif DOP_TASK
+    iterator_t iter;
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
@@ -159,7 +158,9 @@ int main(){
             case '3':
                 res = ask_elem(&info, &key);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                res = insert(table, info, key);
+                iter = insert(table, info, key, &res);
+                if (res != GOOD) free(info);
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
                 if (res == KEY_EXIST) printf("Элемент с таким ключем уже есть!\n");
                 if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
                 break;
@@ -167,15 +168,17 @@ int main(){
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = delete(table, key);
-                if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
-                else printf("Элемент удален.\n");
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
+                else {
+                    if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
+                    else printf("Элемент удален.\n");
+                }
                 break;
             case '5':
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                iterator_t iter;
-                iter = find(table, key);
-                if (iter_compare(iter, null_iter(table))) printf("Элемент не найден.\n");
+                iter = find(table, key, &res);
+                if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
                 else {
                     print_found(iter);
                 }

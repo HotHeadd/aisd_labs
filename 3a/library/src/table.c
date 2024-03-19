@@ -65,9 +65,13 @@ char* iter_value(iterator_t iter){
     return (iter.current)->info;
 }
 
-iterator_t null_iter(table_t* table){
+iterator_t null_iter(){
     iterator_t result = {result.current = NULL};
     return result;
+}
+
+KeySpace* iter_pointer(iterator_t iter){
+    return iter.current;
 }
 
 int binsearch\
@@ -89,45 +93,17 @@ int binsearch\
 	return right;
 }
 
-int compare_ins(const KeySpace* a, const KeySpace* b){
-    return (a->key - b->key);
-}
-
 int compare_fd(const KeySpace* a, const int* b){
     return (a->key - *b);
 }
 
-int ins_elem(table_t* table, KeySpace elem, int index){
-    KeySpace* mass = table->ks;
-    for (int i=table->csize; i>index;i--){
-        mass[i] = mass[i-1];
-    }
-    mass[index] = elem;
-    return GOOD;
-}
-
-int insert(table_t* table, char* info, unsigned int key){
-    if (table == NULL) return NO_TABLE;
-    if (table->msize == table->csize){
-        free(info);
-        return TABLE_OVERFLOW;
-    }
-    KeySpace elem;
-    elem.key = key;
-    elem.info = info;
-    int index = binsearch\
-    (table->ks, &elem, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_ins);
-    if (index < 0){
-        free(info);
-        return KEY_EXIST;
-    }
-    ins_elem(table, elem, index);
-    table->csize += 1;
-    return GOOD;
+int compare_ins(const KeySpace* a, const KeySpace* b){
+    return (a->key - b->key);
 }
 // удаление
 
 int delete(table_t* table, unsigned int key){
+    if (table == NULL) return NO_TABLE;
     int res = binsearch\
     (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
     if (res >= 0) return ELEM_NOT_FOUND;
@@ -163,7 +139,7 @@ KeySpace* copy_elem(KeySpace* elem){
 }
 
 KeySpace* find(table_t *table, unsigned int key){
-    if (table == NULL) return NULL;
+    if ((table == NULL) || (table->csize == 0)) return NULL;
     int res = binsearch\
     (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
     if (res >= 0) return NULL;
@@ -180,7 +156,87 @@ void free_elem(KeySpace* elem){
     free(elem->info);
     free(elem);
 }
+
+int ins_elem(table_t* table, KeySpace elem, int index){
+    KeySpace* mass = table->ks;
+    for (int i=table->csize; i>index;i--){
+        mass[i] = mass[i-1];
+    }
+    mass[index] = elem;
+    return GOOD;
+}
+
+int insert(table_t* table, char* info, unsigned int key){
+    if (table == NULL){
+        return NO_TABLE;
+    }
+    if (table->msize == table->csize){
+        return TABLE_OVERFLOW;
+    }
+    KeySpace elem;
+    elem.key = key;
+    elem.info = info;
+    int index = binsearch\
+    (table->ks, &elem, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_ins);
+    if (index < 0){
+        return KEY_EXIST;
+    }
+    ins_elem(table, elem, index);
+    table->csize += 1;
+    return GOOD;
+}
 #elif DOP_TASK
+
+iterator_t find(table_t *table, unsigned int key, int* res){
+    *res = ELEM_NOT_FOUND;
+    if (table == NULL) null_iter();
+    for (iterator_t i = begin(table); iter_compare(i, end(table)) == 0; i = next(i)){
+        if (iter_key(i) == key){
+            *res = GOOD;
+            return i;
+        }
+        if (iter_key(i) > key){
+            return i;
+        }
+    }
+    return end(table);
+}
+
+void print_found(iterator_t iter){
+    printf("Найденный элемент: %u \"%s\"\n", iter_key(iter), iter_value(iter));
+}
+
+void ins_elem(table_t* table, KeySpace elem, iterator_t index){
+    for (iterator_t i = end(table); iter_compare(i, index) == 0; i = back(i)){
+        *iter_pointer(i) = *iter_pointer(back(i));
+    }
+    *iter_pointer(index) = elem;
+}
+
+// вставка возвращает итератор, указывающий на вставленный элемент
+iterator_t insert(table_t* table, char* info, unsigned int key, int* res){
+    int result;
+    if (table == NULL){
+        *res = NO_TABLE;
+         return null_iter();
+    }
+    if (table->msize == table->csize){
+        *res = TABLE_OVERFLOW;
+        return null_iter();
+    }
+    KeySpace elem;
+    elem.key = key;
+    elem.info = info;
+    iterator_t index = find(table, key, &result);
+    if (result == GOOD){
+        *res = KEY_EXIST;
+        return null_iter();
+    }
+    ins_elem(table, elem, index);
+    table->csize += 1;
+    return index;
+}
+
 // СОЗЖАТЬ ВТОРОЙ НАБОР ФУНКЦИЙ ДЛЯ ТАБЛИЦЫ
 // Вывод при помощи итераторов
 void display(table_t* table){
@@ -193,25 +249,9 @@ void display(table_t* table){
         printf("%u \"%s\"\n", iter_key(i), iter_value(i));
     }
 }
-
-iterator_t find(table_t *table, unsigned int key){
-    iterator_t result = null_iter(table);
-    for (iterator_t i = begin(table); iter_compare(i, end(table)) == 0; i = next(i)){
-        if (iter_key(i) == key){
-            result = i;
-            break;
-        }
-    }
-    return result;
-}
-
-void print_found(iterator_t iter){
-    printf("Найденный элемент: %u \"%s\"\n", iter_key(iter), iter_value(iter));
-}
-// вставка возвращает итератор, указывающий на вставленный элемент
 // Удаление возвращает итератор, который укаызывает на следующий после удаленного элемент
-// Поиск возвращает итератор на найденный элемент
 #endif
+
 // импорт и экспорт таблицы из текстового
 
 int to_text(table_t* table, char* filename){

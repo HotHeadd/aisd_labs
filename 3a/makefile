@@ -19,15 +19,14 @@ LEFT = ar r
 FORMAT = a
 ENDCOMP = 
 
+LIBSOURCE = table
+LIBNAME = table
+
 CHOICE = M
 ifeq ($(CHOICE), M)
-	LIBSOURCE = table
-	LIBNAME = table
 	KEYWORD = MAIN_TASK
 endif
 ifeq ($(CHOICE), D)
-	LIBSOURCE = table
-	LIBNAME = table
 	KEYWORD = DOP_TASK
 endif
 
