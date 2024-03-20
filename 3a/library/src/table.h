@@ -33,34 +33,35 @@ typedef struct iterator_t{
 // typedef struct table_t table_t;
 // TODO: CONST DATA TYPE WHERE REQUIRED
 int binsearch\
-(void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*));
-void display(table_t* table);
-table_t* get_table(int size);
+(const void* data, const void* inserted, const int amount, const int size, int(*copmarator)(const void*, const void*));
+void display(const table_t* table);
+table_t* get_table(const int size);
 void free_table(table_t*);
-int delete(table_t*, unsigned int);
 
-int to_text(table_t* table, char*);
-int from_text(table_t** table, char* filename);
+int to_text(const table_t* table, const char*);
+int from_text(table_t** table, const char* filename);
 
-int delete_interval(table_t* table, int highest, int lowest);
+int delete_interval(table_t* table, const int highest, const int lowest);
 
-int iter_compare(iterator_t first, iterator_t second);
-iterator_t begin(table_t* table);
-iterator_t end(table_t* table);
-iterator_t next(iterator_t iter);
-iterator_t back(iterator_t iter);
+int iter_compare(const iterator_t first, const iterator_t second);
+iterator_t begin(const table_t* table);
+iterator_t end(const table_t* table);
+iterator_t next(const iterator_t iter);
+iterator_t back(const iterator_t iter);
 iterator_t null_iter();
-KeySpace* iter_pointer(iterator_t iter);
-unsigned int iter_key(iterator_t iter);
-char* iter_value(iterator_t iter);
+KeySpace* iter_pointer(const iterator_t iter);
+unsigned int iter_key(const iterator_t iter);
+char* iter_value(const iterator_t iter);
 
 #ifdef MAIN_TASK
-KeySpace* find(table_t*, unsigned int);
-void print_found(KeySpace*);
+KeySpace* find(const table_t*, const unsigned int);
+void print_found(const KeySpace*);
 void free_elem(KeySpace* elem);
 int insert(table_t* table, char* info, unsigned int key);
+int delete(table_t*, const unsigned int);
 #elif DOP_TASK
-iterator_t find(table_t *table, unsigned int key, int* res);
-void print_found(iterator_t iter);
+iterator_t find(const table_t *table, const unsigned int key, int* res);
+void print_found(const iterator_t iter);
 iterator_t insert(table_t* table, char* info, unsigned int key, int* res);
+iterator_t delete(table_t*, const unsigned int, int* res);
 #endif

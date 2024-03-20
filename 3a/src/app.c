@@ -135,7 +135,7 @@ int main(){
                 delete_interval(table, highest, lowest);
                 break;
             default:
-                printf("NIECHEGO\n");
+                printf("Нет такой опции в меню!\n");
         }
         menus();
     }
@@ -159,19 +159,26 @@ int main(){
                 res = ask_elem(&info, &key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 iter = insert(table, info, key, &res);
-                if (res != GOOD) free(info);
+                if (res != GOOD){
+                    free(info);
                 if (res == NO_TABLE) printf("Таблицы нет!\n");
                 if (res == KEY_EXIST) printf("Элемент с таким ключем уже есть!\n");
                 if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
+                }
+                else printf("Итератор на элемент %u \"%s\"\n", iter_key(iter), iter_value(iter));
                 break;
             case '4':
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                res = delete(table, key);
+                iter = delete(table, key, &res);
                 if (res == NO_TABLE) printf("Таблицы нет!\n");
                 else {
                     if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
-                    else printf("Элемент удален.\n");
+                    else {
+                        printf("Элемент удален.\n");
+                        if (iter_compare(iter, null_iter())) printf("Вы удалили последный элемент\n");
+                        else printf("Итератор на элемент %u \"%s\"\n", iter_key(iter), iter_value(iter));
+                    }
                 }
                 break;
             case '5':
@@ -185,10 +192,13 @@ int main(){
                 break;
             case '6':
                 free(filename);
-                filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
+                filename = readline("Введите имя файла, в коbVHJCVHBорый нужно поместить таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
                 res = to_text(table, filename);
+                if (res != GOOD){
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
+                }
                 else printf("Таблица записана\n");
                 break;
             case '7':
@@ -196,10 +206,9 @@ int main(){
                 filename = readline("Введите имя файла, из кторого взять таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
                 res = from_text(&table, filename);
+                if (res != GOOD){
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
-                else if (res == FORMAT_ERROR)
-                {
-                    printf("Ошибка формата данных\n");
+                if (res == FORMAT_ERROR)  printf("Ошибка формата данных\n");
                 }
                 else printf("Таблица записана\n");
                 break;
@@ -220,7 +229,7 @@ int main(){
                 delete_interval(table, highest, lowest);
                 break;
             default:
-                printf("NIECHEGO\n");
+                printf("Нет такой опции в меню!\n");
         }
         menus();
     }

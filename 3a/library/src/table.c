@@ -7,7 +7,7 @@
 // ВСЕ ДИАЛОГИ В ПРИКОЛАДНОЙ ПРОГЕ (диалог только для вывода в файл)
 
 // инициализация
-table_t* get_table(int size){
+table_t* get_table(const int size){
     table_t* table = calloc(1, sizeof(table_t));
     table->msize = size;
     table->ks = calloc(table->msize, sizeof(KeySpace));
@@ -27,41 +27,41 @@ void free_table(table_t* table){
 }
 
 // сравнение итераторов (1 если указывают на один элемент, 0 если нет)
-int iter_compare(iterator_t first, iterator_t second){
+int iter_compare(const iterator_t first, const iterator_t second){
     return first.current == second.current;
 }
 
 // получение итератора, указ на первый элем. таблицы
 
-iterator_t begin(table_t* table){
+iterator_t begin(const table_t* table){
     iterator_t result = {result.current = table->ks};
     return result;
 }
 
 // получение итератора, указ на последний элем. таблицы
 
-iterator_t end(table_t* table){
+iterator_t end(const table_t* table){
     iterator_t result = {result.current = table->ks + table->csize};
     return result;
 }
 
 // получение итератора, указ на следующий элем. таблицы
 
-iterator_t next(iterator_t iter){
+iterator_t next(const iterator_t iter){
     iterator_t result = {result.current = iter.current + 1};
     return result;
 }
 
-iterator_t back(iterator_t iter){
+iterator_t back(const iterator_t iter){
     iterator_t result = {result.current = iter.current - 1};
     return result;
 }
 
-unsigned int iter_key(iterator_t iter){
+unsigned int iter_key(const iterator_t iter){
     return (iter.current)->key;
 }
 
-char* iter_value(iterator_t iter){
+char* iter_value(const iterator_t iter){
     return (iter.current)->info;
 }
 
@@ -70,12 +70,12 @@ iterator_t null_iter(){
     return result;
 }
 
-KeySpace* iter_pointer(iterator_t iter){
+KeySpace* iter_pointer(const iterator_t iter){
     return iter.current;
 }
 
 int binsearch\
-(void* data, void* inserted, int amount, int size, int(*copmarator)(const void*, const void*)){
+(const void* data, const void* inserted, const int amount, int size, int(*copmarator)(const void*, const void*)){
 	int left = 0, right = amount, res, index=0;
 	void* element = data;
 	while (left+1 < right){
@@ -102,24 +102,9 @@ int compare_ins(const KeySpace* a, const KeySpace* b){
 }
 // удаление
 
-int delete(table_t* table, unsigned int key){
-    if (table == NULL) return NO_TABLE;
-    int res = binsearch\
-    (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
-    if (res >= 0) return ELEM_NOT_FOUND;
-    res = (-1)*(res+1);
-    free((table->ks+res)->info);
-    for (int i=res; i<table->csize-1;i++){
-        (table->ks)[i] = (table->ks)[i+1];
-    }
-    table->csize -= 1;
-    return GOOD;
-}
-
-
 #ifdef MAIN_TASK
 // вывод таблицы в поток
-void display(table_t* table){
+void display(const table_t* table){
     if (table == NULL){
         printf("Никакой таблицы нет");
         return;
@@ -131,14 +116,14 @@ void display(table_t* table){
 }
 // поиск по ключу (В таблице не может быть двух элементов с одинаковыми значениями ключей.)
 
-KeySpace* copy_elem(KeySpace* elem){
+KeySpace* copy_elem(const KeySpace* elem){
     KeySpace* copy = calloc(1, sizeof(KeySpace));
     copy->key = elem->key;
     copy->info = strdup(elem->info);
     return copy;
 }
 
-KeySpace* find(table_t *table, unsigned int key){
+KeySpace* find(const table_t *table, const unsigned int key){
     if ((table == NULL) || (table->csize == 0)) return NULL;
     int res = binsearch\
     (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
@@ -148,7 +133,7 @@ KeySpace* find(table_t *table, unsigned int key){
     return copy;
 }
 
-void print_found(KeySpace* elem){
+void print_found(const KeySpace* elem){
     printf("Найденный элемент: %u \"%s\"\n", elem->key, elem->info);
 }
 
@@ -185,11 +170,63 @@ int insert(table_t* table, char* info, unsigned int key){
     table->csize += 1;
     return GOOD;
 }
+
+int delete(table_t* table, const unsigned int key){
+    if (table == NULL) return NO_TABLE;
+    int res = binsearch\
+    (table->ks, &key, table->csize, sizeof(KeySpace), (int (*)(const void*, const void*)) compare_fd);
+    if (res >= 0) return ELEM_NOT_FOUND;
+    res = (-1)*(res+1);
+    free((table->ks+res)->info);
+    for (int i=res; i<table->csize-1;i++){
+        (table->ks)[i] = (table->ks)[i+1];
+    }
+    table->csize -= 1;
+    return GOOD;
+}
+
+int delete_interval(table_t* table, const int highest, const int lowest){
+    for (int i=lowest; i<=highest; i++){
+        delete(table, i);
+    }
+    return GOOD;
+}
+
+
 #elif DOP_TASK
 
-iterator_t find(table_t *table, unsigned int key, int* res){
+iterator_t delete(table_t* table, const unsigned int key, int* res){
+    int res_find;
+    if (table == NULL){
+        *res = NO_TABLE;
+        return null_iter();
+    }
+    iterator_t iter = find(table, key, &res_find);
+    if (res_find == ELEM_NOT_FOUND){
+        *res = ELEM_NOT_FOUND;
+        return null_iter();
+    }
+    free(iter_value(iter));
+    for (iterator_t i = iter; iter_compare(i, back(end(table)))==0 ; i = next(i)){
+        // printf("УДАЛЕНИЕ Итератор на элемент %u \"%s\"\n", iter_key(i), iter_value(i));
+        *iter_pointer(i) = *iter_pointer(next(i));
+    }
+    table->csize -= 1;
+    if (iter_compare(iter, end(table))) return null_iter();
+    return iter;
+}
+
+int delete_interval(table_t* table, const int highest, const int lowest){
+    int res;
+    for (int i=lowest; i<=highest; i++){
+        delete(table, i, &res);
+    }
+    return GOOD;
+}
+
+iterator_t find(const table_t *table, const unsigned int key, int* res){
     *res = ELEM_NOT_FOUND;
-    if (table == NULL) null_iter();
+    if (table == NULL) return null_iter();
     for (iterator_t i = begin(table); iter_compare(i, end(table)) == 0; i = next(i)){
         if (iter_key(i) == key){
             *res = GOOD;
@@ -239,7 +276,7 @@ iterator_t insert(table_t* table, char* info, unsigned int key, int* res){
 
 // СОЗЖАТЬ ВТОРОЙ НАБОР ФУНКЦИЙ ДЛЯ ТАБЛИЦЫ
 // Вывод при помощи итераторов
-void display(table_t* table){
+void display(const table_t* table){
     if (table == NULL){
         printf("Никакой таблицы нет");
         return;
@@ -254,7 +291,8 @@ void display(table_t* table){
 
 // импорт и экспорт таблицы из текстового
 
-int to_text(table_t* table, char* filename){
+int to_text(const table_t* table, const char* filename){
+    if (table == NULL) return NO_TABLE;
     FILE* output = fopen(filename, "w");
     if (output == NULL) return FILE_ERROR;
     fprintf(output, "%d %d\n", table->msize, table->csize);
@@ -291,7 +329,7 @@ char* file_readline(FILE* file){ //переделанный для файлов 
     return str;
 }
 
-int from_text(table_t** table, char* filename){
+int from_text(table_t** table, const char* filename){
     free_table(*table);
     int res, size;
     FILE* input = fopen(filename, "r");
@@ -335,16 +373,5 @@ int from_text(table_t** table, char* filename){
         return FORMAT_ERROR;
     }
     fclose(input);
-    return GOOD;
-}
-
-// индивид таск
-// удаление из таблицы элементов, заданных диапазоном ключей; в таблице могут отсутствовать
-// элементы с ключами, задающими диапазон.
-
-int delete_interval(table_t* table, int highest, int lowest){
-    for (int i=lowest; i<=highest; i++){
-        delete(table, i);
-    }
     return GOOD;
 }
