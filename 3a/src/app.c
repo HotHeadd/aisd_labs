@@ -177,14 +177,14 @@ int main(){
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 iter = delete(table, key, &res);
-                if (res == NO_TABLE) printf("Таблицы нет!\n");
-                else {
+                if (res != GOOD){
                 if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
-                else {
-                    printf("Элемент удален.\n");
-                    if (iter_compare(iter, null_iter())) printf("Вы удалили последный элемент\n");
-                    else printf("Итератор на элемент %u \"%s\"\n", iter_key(iter), iter_value(iter));
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
                 }
+                else{
+                    printf("Элемент удален.\n");
+                    if (res == LAST_ELEMENT) printf("Вы удалили последный элемент\n");
+                    else printf("Итератор на элемент %u \"%s\"\n", iter_key(iter), iter_value(iter));
                 }
                 break;
             case '5':
@@ -221,15 +221,15 @@ int main(){
             case '8':
                 int highest, lowest;
                 printf("Введите нижний ключ: ");
-                res = custom_int_input(&lowest, only_negative);
+                res = custom_int_input(&lowest, o_n_and_0);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 printf("Введите верхний ключ: ");
-                res = custom_int_input(&highest, only_negative);
+                res = custom_int_input(&highest, o_n_and_0);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 while (highest < lowest){
                     printf("Неправильный верхний ключ!\n");
                     printf("Введите верхний ключ: ");
-                    res = custom_int_input(&highest, only_negative);
+                    res = custom_int_input(&highest, o_n_and_0);
                     if (res == -1) return eXXit(GOOD, table, filename);
                 }
                 delete_interval(table, highest, lowest);

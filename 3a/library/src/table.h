@@ -9,7 +9,7 @@
 #define END_INPUT -1
 #define NO_TABLE 6
 #define EOTABLE 10
-
+#define LAST_ELEMENT 11
 typedef struct KeySpace {
     // ключ элемента
     unsigned int key;
@@ -53,7 +53,6 @@ iterator_t begin(const table_t* table);
 iterator_t end(const table_t* table);
 iterator_t next(const iterator_t iter);
 iterator_t back(const iterator_t iter);
-iterator_t null_iter();
 KeySpace* iter_pointer(const iterator_t iter);
 unsigned int iter_key(const iterator_t iter);
 char* iter_value(const iterator_t iter);

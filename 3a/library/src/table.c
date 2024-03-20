@@ -286,7 +286,10 @@ iterator_t delete(table_t* table, const unsigned int key, int* res){
         *iter_pointer(i) = *iter_pointer(next(i));
     }
     table->csize -= 1;
-    if (iter_compare(iter, end(table))) return null_iter();
+    if (iter_compare(iter, end(table))) {
+        *res = LAST_ELEMENT;
+        return null_iter();
+    }
     return iter;
 }
 
