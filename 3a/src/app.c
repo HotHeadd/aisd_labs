@@ -85,7 +85,10 @@ int main(){
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = delete(table, key);
+                if (res != GOOD){
                 if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
+                }
                 else printf("Элемент удален.\n");
                 break;
             case '5':
@@ -103,7 +106,10 @@ int main(){
                 filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
                 res = to_text(table, filename);
+                if (res != GOOD){
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
+                }
                 else printf("Таблица записана\n");
                 break;
             case '7':
@@ -132,7 +138,7 @@ int main(){
                     res = custom_int_input(&highest, only_negative);
                     if (res == -1) return eXXit(GOOD, table, filename);
                 }
-                delete_interval(table, highest, lowest);
+                res = delete_interval(table, highest, lowest);
                 break;
             default:
                 printf("Нет такой опции в меню!\n");
@@ -173,12 +179,12 @@ int main(){
                 iter = delete(table, key, &res);
                 if (res == NO_TABLE) printf("Таблицы нет!\n");
                 else {
-                    if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
-                    else {
-                        printf("Элемент удален.\n");
-                        if (iter_compare(iter, null_iter())) printf("Вы удалили последный элемент\n");
-                        else printf("Итератор на элемент %u \"%s\"\n", iter_key(iter), iter_value(iter));
-                    }
+                if (res == ELEM_NOT_FOUND) printf("Элемент не найден.\n");
+                else {
+                    printf("Элемент удален.\n");
+                    if (iter_compare(iter, null_iter())) printf("Вы удалили последный элемент\n");
+                    else printf("Итератор на элемент %u \"%s\"\n", iter_key(iter), iter_value(iter));
+                }
                 }
                 break;
             case '5':
@@ -192,7 +198,7 @@ int main(){
                 break;
             case '6':
                 free(filename);
-                filename = readline("Введите имя файла, в коbVHJCVHBорый нужно поместить таблицу: ");
+                filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
                 res = to_text(table, filename);
                 if (res != GOOD){
