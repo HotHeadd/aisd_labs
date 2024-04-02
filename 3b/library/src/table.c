@@ -6,8 +6,6 @@
 #include <math.h>
 #include <unistd.h>
 
-// ВСЕ ДИАЛОГИ В ПРИКОЛАДНОЙ ПРОГЕ (диалог только для вывода в файл)
-
 // инициализация
 table_t* get_table(const int size){
     table_t* table = calloc(1, sizeof(table_t));
@@ -115,19 +113,16 @@ int insert(table_t** table, unsigned info, unsigned key){
         }
     }
     else{
-        KeySpace* neww = calloc(1, sizeof(KeySpace));
-        neww->next = elem->next;
-        neww->info = elem->info;
-        neww->key = elem->key;
-        neww->release = elem->release;
-        do{
+        while ((elem->next) != NULL){
             if (elem->key == key) release++;
+            elem = elem->next;
         }
-        while ((elem = elem->next) != NULL);
-        elem = (*table)->ks + index;
-        elem->key = key;
-        elem->info = to_input;
-        elem->release = release;
+        if (elem->key == key) release++;
+        KeySpace* neww = calloc(1, sizeof(KeySpace));
+        neww->key = key;
+        neww->info = to_input;
+        neww->release = release;
+        neww->next = NULL;
         elem->next = neww;
     }
     return GOOD;
