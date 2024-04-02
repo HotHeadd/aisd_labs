@@ -82,16 +82,15 @@ table_t* extend_table(table_t* table){
     table_t* new_table =  get_table(simple(table->msize));
     for (int i=0;i<table->msize;i++){
         KeySpace* elem = table->ks+i;
-        unsigned index = hash_func(new_table, elem->key);
-        (new_table->ks+index)->key = elem->key;
-        (new_table->ks+index)->info = elem->info;
-        (new_table->ks+index)->release = elem->release;
-        (new_table->ks+index)->next = elem->next;
-        new_table->csize++;
+        while (elem != NULL){
+            if (elem->info != NULL){
+                insert(&new_table, *(elem->info), elem->key);
+            }
+            elem = elem->next;
+        }
     }
     printf("Таблица расширена\n");
-    free(table->ks);
-    free(table);
+    free_table(table);
     return new_table;
 }
 
@@ -106,14 +105,14 @@ int insert(table_t** table, unsigned info, unsigned key){
     unsigned release = 0;
     if (elem->info == NULL){
         (*table)->csize++;
-        if ((*table)->msize == (*table)->csize){
-            (*table) = extend_table(*table);
-        }
         index = hash_func(*table, key);
         elem = (*table)->ks + index;
         elem->key = key;
         elem->info = to_input;
         elem->release = 0;
+        if ((*table)->msize == (*table)->csize){
+            (*table) = extend_table(*table);
+        }
     }
     else{
         KeySpace* neww = calloc(1, sizeof(KeySpace));
