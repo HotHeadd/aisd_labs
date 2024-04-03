@@ -38,7 +38,10 @@ int to_binary(const table_t* table, const char*);
 int from_binary(table_t** table, const char* filename);
 
 KeySpace* find(const table_t*, const unsigned);
-void print_found(const KeySpace*);
-void free_elem(KeySpace* elem);
-int insert(table_t** table, unsigned info, unsigned);
+void print_and_free(KeySpace*);
+int insert(table_t** table, unsigned, unsigned info);
 int delete(table_t*, const unsigned int);
+
+KeySpace* find_special(const table_t *table, const unsigned int key, const int release);
+void print_and_free_spec(KeySpace*, int);
+void reorganize(table_t* table);

@@ -41,31 +41,6 @@ int custom_int_input(int* poin, int (*fun)(double)){
 	}
 	return retu;}
 
-int InputArray(int **poin){
-	printf("Input array length (only positive length): ");
-	int len=0, retu = custom_int_input(&len, only_negative);
-	if (retu==-1) return -1;
-	int* data = (int*)malloc((len)*sizeof(int));
-	if (data != NULL) *poin = data;
-	else return -2;
-	for (int i=0; i<len;i++){
-		printf("Input array elem: ");
-		retu = custom_int_input(*poin+i, always_false);
-		if (retu==-1) return -1;
-	}
-	return len;
-}
-
-int OutputArray(int *data, int len){
-	printf("[");
-	for (int i=0; i < len; i++){
-		printf("%d", *(data+i));
-		if (i != (len-1)) printf(", ");
-	}
-	printf("]\n");
-	return 0;
-}
-
 char better_getchar(){
 	char buk=0, tras=0;
 	int retu = scanf("%c", &buk);

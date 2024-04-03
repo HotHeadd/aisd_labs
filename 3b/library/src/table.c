@@ -128,24 +128,61 @@ int insert(table_t** table, unsigned key, unsigned info){
     return GOOD;
 }
 
+KeySpace copy_elem(const KeySpace* elem){
+    KeySpace res;
+    unsigned* new_info = calloc(1, sizeof(unsigned));
+    *new_info = *(elem->info);
+    res.key = elem->key;
+    res.release = elem->release;
+    res.info = new_info;
+    res.next = NULL;
+    return res;
+}
+
 KeySpace* find(const table_t *table, const unsigned int key){
-    return NULL;
+    if ((table == NULL) || (table->csize == 0)) return NULL;
+    unsigned index = hash_func(table, key);
+    KeySpace* elem = (table)->ks + index;
+    KeySpace* copy = NULL;
+    KeySpace* resault = NULL;
+    int count=0;
+    if (elem->info == NULL) return NULL;
+    while (elem != NULL){
+        if (elem->key == key) count++;
+        elem = elem->next;
+    }
+    elem = (table)->ks + index;
+    if (count > 0) resault = calloc(count, sizeof(KeySpace));
+    else return NULL;
+    while (elem != NULL){
+        if (elem->key == key){
+            count--;
+            resault[count] = copy_elem(elem);
+        }
+        elem = elem->next;
+    }
+    return resault;
 }
 
-KeySpace* copy_elem(const KeySpace* elem){
-    return NULL;
+void free_found(KeySpace* resault){
+    if (resault == NULL) return;
+    int size = resault->release;
+    for (int i=0; i<size+1; i++){
+        free((resault+i)->info);
+    }
+    free(resault);
 }
 
-void print_found(const KeySpace* elem){
-    printf("Найденный элемент: %u \"%u\"\n", elem->key, *elem->info);
+void print_and_free(KeySpace* resault){
+    printf("Найденные элементы:\n");
+    for (int i=resault->release; i >= 0; i--){
+        KeySpace* elem = resault + i;
+        printf("|%-10u|%-10u|%2u|\n", elem->key, *elem->info, elem->release);
+    }
+    free_found(resault);
 }
 
-void free_elem(KeySpace* elem){
-    free(elem->info);
-    free(elem);
-}
-
-void del_elem(KeySpace* elem){
+int del_elem(KeySpace* elem){
     if (elem->next == NULL){
         free(elem->info);
         elem->key = 0;
@@ -162,29 +199,36 @@ void del_elem(KeySpace* elem){
         elem->info = ne->info;
         free(ne);
     }
+    return 1;
 }
 
 int delete(table_t* table, const unsigned key){
     if (table == NULL) return NO_TABLE;
+    int res = 0;
     unsigned index = hash_func(table, key);
     KeySpace* elem = (table)->ks + index;
     if (elem->info == NULL) return ELEM_NOT_FOUND;
     if ((elem->next == NULL) && (elem->key == key)){
-        del_elem(elem);
+       res = del_elem(elem);
     }
     else{
-        while (elem->next != NULL){//info
-            while (elem->key == key){
-                del_elem(elem);
+        while (elem != NULL){
+            while ((elem != NULL) && (elem->key == key)){
+                res = del_elem(elem);
             }
-            if ((elem->next != NULL) && (elem->next->key == key)){
-                del_elem(elem->next);
+            while ((elem != NULL) && (elem->next != NULL) && (elem->next->info != NULL) && (elem->next->key == key)){
+                res = del_elem(elem->next);
             }
-            if (elem->info != NULL) elem = elem->next;
+            if ((elem != NULL) && (elem->next != NULL) && (elem->next->info == NULL)){
+                free(elem->next);
+                elem->next = NULL;
+            }
+            elem = elem->next;
         }
     }
     if (((table)->ks + index)->info == NULL) table->csize--;
-    return GOOD;
+    if (res == 1) return GOOD;
+    else return ELEM_NOT_FOUND;
 }
 
 int to_binary(const table_t* table, const char* filename ){
@@ -230,4 +274,51 @@ int from_binary(table_t** table, const char* filename){
     if (res == 1) return FORMAT_ERROR;
     fclose(input);
     return GOOD;
+}
+
+KeySpace* find_special(const table_t *table, const unsigned key, const int release){
+    if ((table == NULL) || (table->csize == 0)) return NULL;
+    unsigned index = hash_func(table, key);
+    KeySpace* elem = (table)->ks + index;
+    KeySpace* resault = NULL;
+    int count=0;
+    if (elem->info == NULL) return NULL;
+    while (elem != NULL){
+        if (elem->key == key){
+            if (elem->release == release) return elem;
+            count++;
+        }
+        elem = elem->next;
+    }
+    if (release >= 0) return NULL;
+    elem = (table)->ks + index;
+    if (count == 0) return NULL;
+    resault = calloc(count, sizeof(KeySpace));
+    while (elem != NULL){
+        if (elem->key == key){
+            count--;
+            resault[count] = *elem;
+        }
+        elem = elem->next;
+    }
+    return resault;
+}
+
+void print_and_free_spec(KeySpace* resault, int release){
+    if (release < 0){
+        printf("Найденные элементы:\n");
+        for (int i=resault->release; i >= 0; i--){
+            KeySpace* elem = resault + i;
+            printf("|%-10u|%-10u|%2u|\n", elem->key, *elem->info, elem->release);
+        }
+        free(resault);
+    }
+    else{
+        printf("Найденный элемент:\n");
+        printf("|%-10u|%-10u|%2u|\n", resault->key, *resault->info, resault->release);
+    }
+}
+
+void reorganize(table_t* table){
+    // оставить телько последние версии
 }

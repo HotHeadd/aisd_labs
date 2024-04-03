@@ -23,6 +23,12 @@ int ask_key(unsigned *key){
     return GOOD;
 }
 
+int ask_release(int* release){
+    printf("Введите версию (-1 если искать все): ");
+    int res = custom_int_input(release, always_false);
+    if (res == -1) return END_INPUT;
+    return GOOD;
+}
 
 int ask_elem(unsigned* key, unsigned* info){
     printf("Введите ключ: ");
@@ -33,9 +39,6 @@ int ask_elem(unsigned* key, unsigned* info){
     if (res == -1) return END_INPUT;
     return GOOD;
 }
-
-
-// НЕ КОНЧАЕМ РАБОТУ ДО КОНТРОЛ Д
 
 void menus(){
     printf("\nВыберете опцию\n");
@@ -54,8 +57,8 @@ void menus(){
 int main(){
     char choice;
     void* ret;
-    unsigned key;
-    unsigned info;
+    unsigned key, info;
+    int release=-1;
     int res;
     char* filename = NULL;
     int size;
@@ -92,14 +95,11 @@ int main(){
                 else printf("Элемент удален.\n");
                 break;
             case '5':
-                //res = ask_key(&key);
+                res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 ret = find(table, key);
                 if (ret == NULL) printf("Элемент не найден.\n");
-                else {
-                    print_found(ret);
-                    free_elem(ret);
-                }
+                else print_and_free(ret);
                 break;
             case '6':
                 free(filename);
@@ -124,7 +124,17 @@ int main(){
                 else printf("Таблица считана\n");
                 break;
             case '8':
-                // indie
+                res = ask_key(&key);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                res = ask_release(&release);
+                if (res == -1) return eXXit(GOOD, table, filename);
+                ret = find_special(table, key, release);
+                if (ret == NULL) printf("Элемент не найден.\n");
+                else print_and_free_spec(ret, release);
+                break;
+            case '9':
+                reorganize(table);
+                printf("Таблица реогранизована!\n");
                 break;
             default:
                 printf("Нет такой опции в меню!\n");
