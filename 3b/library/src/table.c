@@ -5,7 +5,6 @@
 #include "table.h"
 #include <math.h>
 #include <unistd.h>
-
 // инициализация
 table_t* get_table(const int size){
     table_t* table = calloc(1, sizeof(table_t));
@@ -92,6 +91,11 @@ table_t* extend_table(table_t* table){
     return new_table;
 }
 
+int max_rel(unsigned x, unsigned y){
+    if (x > y) return x;
+    return y;
+}
+
 int insert(table_t** table, unsigned key, unsigned info){
     if (*table == NULL){
         return NO_TABLE;
@@ -114,10 +118,11 @@ int insert(table_t** table, unsigned key, unsigned info){
     }
     else{
         while ((elem->next) != NULL){
-            if (elem->key == key) release++;
+            if (elem->key == key) release = max_rel(release, elem->release);
             elem = elem->next;
         }
-        if (elem->key == key) release++;
+        if (elem->key == key) release = max_rel(release, elem->release);
+        release++;
         KeySpace* neww = calloc(1, sizeof(KeySpace));
         neww->key = key;
         neww->info = to_input;
