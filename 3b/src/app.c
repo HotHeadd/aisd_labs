@@ -78,7 +78,7 @@ int main(){
             case '3':
                 res = ask_elem(&key, &info);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                res = insert(&table, info, key);
+                res = insert(&table, key, info);
                 if (res == NO_TABLE) printf("Таблицы нет!\n");
                 break;
             case '4':
@@ -114,15 +114,14 @@ int main(){
                 break;
             case '7':
                 free(filename);
-                filename = readline("Введите имя файла, из кторого взять таблицу: ");
+                filename = readline("Введите имя файла, из которого взять таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
-                //res = from_text(&table, filename);
+                res = from_binary(&table, filename);
+                if (res != GOOD){
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
-                else if (res == FORMAT_ERROR)
-                {
-                    printf("Ошибка формата данных\n");
+                if (res == FORMAT_ERROR) printf("Ошибка формата данных\n");
                 }
-                else printf("Таблица записана\n");
+                else printf("Таблица считана\n");
                 break;
             case '8':
                 // indie

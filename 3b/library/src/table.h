@@ -34,8 +34,8 @@ void display(const table_t* table);
 table_t* get_table(const int size);
 void free_table(table_t * const table);
 
-int to_text(const table_t* table, const char*);
-int from_text(table_t** table, const char* filename);
+int to_binary(const table_t* table, const char*);
+int from_binary(table_t** table, const char* filename);
 
 KeySpace* find(const table_t*, const unsigned);
 void print_found(const KeySpace*);

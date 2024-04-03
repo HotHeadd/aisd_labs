@@ -82,7 +82,7 @@ table_t* extend_table(table_t* table){
         KeySpace* elem = table->ks+i;
         while (elem != NULL){
             if (elem->info != NULL){
-                insert(&new_table, *(elem->info), elem->key);
+                insert(&new_table, elem->key, *(elem->info));
             }
             elem = elem->next;
         }
@@ -92,7 +92,7 @@ table_t* extend_table(table_t* table){
     return new_table;
 }
 
-int insert(table_t** table, unsigned info, unsigned key){
+int insert(table_t** table, unsigned key, unsigned info){
     if (*table == NULL){
         return NO_TABLE;
     }
@@ -192,46 +192,42 @@ int to_binary(const table_t* table, const char* filename ){
     FILE* output = fopen(filename, "wb");
     if (output == NULL) return FILE_ERROR;
     fwrite(&(table->msize), sizeof(int), 1, output);
-    fwrite(&(table->csize), sizeof(int), 1, output);
     for (int i=0; i<table->msize; i++){
         KeySpace* elem = table->ks+i;
-        while (elem->next != NULL){
-            fwrite(&((table->ks)->key), sizeof(unsigned), 1, output);
-            fwrite((table->ks)->info, sizeof(unsigned), 1, output);
-            fwrite(&((table->ks)->release), sizeof(unsigned), 1, output);
-            elem=elem->next;
+        if (elem->info != NULL){
+            while (elem->next != NULL){
+                fwrite(&(elem->key), sizeof(unsigned), 1, output);
+                fwrite(elem->info, sizeof(unsigned), 1, output);
+                elem=elem->next;
+            }
+            fwrite(&(elem->key), sizeof(unsigned), 1, output);
+            fwrite(elem->info, sizeof(unsigned), 1, output);
         }
-        fwrite(&((table->ks)->key), sizeof(unsigned), 1, output);
-        fwrite((table->ks)->info, sizeof(unsigned), 1, output);
-        fwrite(&((table->ks)->release), sizeof(unsigned), 1, output);
     }
+    fclose(output);
     return GOOD;
 }
 
 int from_binary(table_t** table, const char* filename){
     free_table(*table);
+    char check;
     int res, size;
-    unsigned key, release;
-    unsigned* info;
-    FILE* input = fopen(filename, "r");
+    unsigned key, info;
+    FILE* input = fopen(filename, "rb");
     if (input == NULL){
         *table = NULL;
         return FILE_ERROR;
     }
-    res = fscanf(input, "%d", &size);
-    if (res == 0) return FORMAT_ERROR;
+    res = fread(&size, sizeof(int), 1, input);
+    if ((res == 0) || (size <= 0)) return EOTABLE;
     *table = get_table(size);
-    res = fscanf(input, "%d%*c", &size);
-    if (res == 0) return FORMAT_ERROR;
-    (*table)->csize = size;
-    if ((*table)->csize > (*table)->msize){
-        (*table)->csize = 0;
-        free_table(*table);
-        *table = NULL;
-        return FORMAT_ERROR;
+    while (fread(&key, sizeof(unsigned), 1, input) != 0){
+        res = fread(&info, sizeof(unsigned), 1, input);
+        if (res == 0) return  FORMAT_ERROR;
+        insert(table, key, info);
     }
-    for (int i=0; i<(*table)->msize;i++){
-        return GOOD;
-    }
+    res = fread(&check, sizeof(char), 1, input);
+    if (res == 1) return FORMAT_ERROR;
+    fclose(input);
     return GOOD;
 }
