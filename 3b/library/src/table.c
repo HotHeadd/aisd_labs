@@ -319,6 +319,29 @@ void print_and_free_spec(KeySpace* resault, int release){
     }
 }
 
-void reorganize(table_t* table){
-    // оставить телько последние версии
+void flush_list(KeySpace* elem){
+    KeySpace* current;
+    while (elem != NULL){
+        int flag_del = 0;
+        current = elem->next;
+        while (current != NULL){
+            if (current->key == elem->key){
+                del_elem(elem);
+                flag_del = 1;
+                break;
+            }
+            current = current->next;
+        }
+        if (flag_del == 0) elem = elem->next;
+    }
+}
+
+int reorganize(table_t* table){
+    KeySpace* elem;
+    if (table == NULL) return NO_TABLE;
+    for (int i = 0; i < table->msize; i++){
+        elem = table->ks + i;
+        if (elem->info == NULL) continue;
+        flush_list(elem);
+    }
 }

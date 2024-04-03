@@ -133,7 +133,7 @@ int main(){
                 else print_and_free_spec(ret, release);
                 break;
             case '9':
-                reorganize(table);
+                res = reorganize(table);
                 printf("Таблица реогранизована!\n");
                 break;
             default:

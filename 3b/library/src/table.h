@@ -44,4 +44,4 @@ int delete(table_t*, const unsigned int);
 
 KeySpace* find_special(const table_t *table, const unsigned int key, const int release);
 void print_and_free_spec(KeySpace*, int);
-void reorganize(table_t* table);
+int reorganize(table_t* table);
