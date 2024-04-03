@@ -177,7 +177,7 @@ int delete(table_t* table, const unsigned key){
             while (elem->key == key){
                 del_elem(elem);
             }
-            if (elem->next != NULL) && (elem->next->key == key){
+            if ((elem->next != NULL) && (elem->next->key == key)){
                 del_elem(elem->next);
             }
             if (elem->info != NULL) elem = elem->next;
