@@ -173,7 +173,7 @@ int delete(table_t* table, const unsigned key){
         del_elem(elem);
     }
     else{
-        while (elem->next != NULL){
+        while (elem->next != NULL){//info
             while (elem->key == key){
                 del_elem(elem);
             }
@@ -184,5 +184,54 @@ int delete(table_t* table, const unsigned key){
         }
     }
     if (((table)->ks + index)->info == NULL) table->csize--;
+    return GOOD;
+}
+
+int to_binary(const table_t* table, const char* filename ){
+    if (table == NULL) return NO_TABLE;
+    FILE* output = fopen(filename, "wb");
+    if (output == NULL) return FILE_ERROR;
+    fwrite(&(table->msize), sizeof(int), 1, output);
+    fwrite(&(table->csize), sizeof(int), 1, output);
+    for (int i=0; i<table->msize; i++){
+        KeySpace* elem = table->ks+i;
+        while (elem->next != NULL){
+            fwrite(&((table->ks)->key), sizeof(unsigned), 1, output);
+            fwrite((table->ks)->info, sizeof(unsigned), 1, output);
+            fwrite(&((table->ks)->release), sizeof(unsigned), 1, output);
+            elem=elem->next;
+        }
+        fwrite(&((table->ks)->key), sizeof(unsigned), 1, output);
+        fwrite((table->ks)->info, sizeof(unsigned), 1, output);
+        fwrite(&((table->ks)->release), sizeof(unsigned), 1, output);
+    }
+    return GOOD;
+}
+
+int from_binary(table_t** table, const char* filename){
+    free_table(*table);
+    int res, size;
+    unsigned key, release;
+    unsigned* info;
+    FILE* input = fopen(filename, "r");
+    if (input == NULL){
+        *table = NULL;
+        return FILE_ERROR;
+    }
+    res = fscanf(input, "%d", &size);
+    if (res == 0) return FORMAT_ERROR;
+    *table = get_table(size);
+    res = fscanf(input, "%d%*c", &size);
+    if (res == 0) return FORMAT_ERROR;
+    (*table)->csize = size;
+    if ((*table)->csize > (*table)->msize){
+        (*table)->csize = 0;
+        free_table(*table);
+        *table = NULL;
+        return FORMAT_ERROR;
+    }
+    for (int i=0; i<(*table)->msize;i++){
+        return GOOD;
+    }
     return GOOD;
 }

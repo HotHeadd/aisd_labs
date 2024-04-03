@@ -105,7 +105,7 @@ int main(){
                 free(filename);
                 filename = readline("Введите имя файла, в который нужно поместить таблицу: ");
                 if (filename == NULL) return eXXit(GOOD, table, filename);
-                //res = to_text(table, filename);
+                res = to_binary(table, filename);
                 if (res != GOOD){
                 if (res == NO_TABLE) printf("Таблицы нет!\n");
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
