@@ -44,8 +44,8 @@ void menus(){
     printf("(3) Вставить элемент в таблицу\n");
     printf("(4) Удалить элемент из таблицы\n");
     printf("(5) Найти элемент в таблице\n");
-    printf("(6) Записать таблицу в текстовый файл\n");
-    printf("(7) Получить таблицу из текстового файла\n");
+    printf("(6) Записать таблицу в бинарный файл\n");
+    printf("(7) Получить таблицу из бинарного файла\n");
     printf("(8) Индивидуальное задание 1 -- поиск по ключу или версии\n");
     printf("(9) Индивидуальное задание 2 -- реорганизация таблицы\n");
     printf("--> ");
@@ -80,10 +80,9 @@ int main(){
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = insert(&table, info, key);
                 if (res == NO_TABLE) printf("Таблицы нет!\n");
-                if (res == TABLE_OVERFLOW) printf("Таблица переполнена!\n");
                 break;
             case '4':
-                //res = ask_key(&key);
+                res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = delete(table, key);
                 if (res != GOOD){

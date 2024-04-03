@@ -145,8 +145,44 @@ void free_elem(KeySpace* elem){
     free(elem);
 }
 
+void del_elem(KeySpace* elem){
+    if (elem->next == NULL){
+        free(elem->info);
+        elem->key = 0;
+        elem->info = NULL;
+        elem->release = 0;
+        elem->next = NULL;
+    }
+    else{
+        KeySpace* ne = elem->next;
+        elem->next = ne->next;
+        elem->key = ne->key;
+        elem->release = ne->release;
+        free(elem->info);
+        elem->info = ne->info;
+        free(ne);
+    }
+}
+
 int delete(table_t* table, const unsigned key){
     if (table == NULL) return NO_TABLE;
-    table->csize--;
+    unsigned index = hash_func(table, key);
+    KeySpace* elem = (table)->ks + index;
+    if (elem->info == NULL) return ELEM_NOT_FOUND;
+    if ((elem->next == NULL) && (elem->key == key)){
+        del_elem(elem);
+    }
+    else{
+        while (elem->next != NULL){
+            while (elem->key == key){
+                del_elem(elem);
+            }
+            if (elem->next != NULL) && (elem->next->key == key){
+                del_elem(elem->next);
+            }
+            if (elem->info != NULL) elem = elem->next;
+        }
+    }
+    if (((table)->ks + index)->info == NULL) table->csize--;
     return GOOD;
 }
