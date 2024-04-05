@@ -91,9 +91,24 @@ table_t* extend_table(table_t* table){
     return new_table;
 }
 
-int max_rel(unsigned x, unsigned y){
-    if (x > y) return x;
-    return y;
+int max_rel(KeySpace* elem, unsigned key){
+    while (elem != NULL){
+        if (elem->key == key) return elem->release + 1;
+        elem = elem->next;
+    }
+    return 0;
+}
+
+void ins_elem(KeySpace* elem, unsigned key, unsigned* info, int release){
+    KeySpace* neww = calloc(1, sizeof(KeySpace));
+    neww->key=elem->key;
+    neww->info = elem->info;
+    neww->release = elem->release;
+    neww->next = elem->next;
+    elem->key = key;
+    elem->info = info;
+    elem->release = release;
+    elem->next = neww;
 }
 
 int insert(table_t** table, unsigned key, unsigned info){
@@ -104,31 +119,18 @@ int insert(table_t** table, unsigned key, unsigned info){
     *to_input = info;
     unsigned index = hash_func(*table, key);
     KeySpace* elem = (*table)->ks + index;
-    unsigned release = 0;
+    int release = 0;
     if (elem->info == NULL){
         (*table)->csize++;
-        index = hash_func(*table, key);
-        elem = (*table)->ks + index;
         elem->key = key;
         elem->info = to_input;
-        elem->release = 0;
         if ((*table)->msize == (*table)->csize){
             (*table) = extend_table(*table);
         }
     }
     else{
-        while ((elem->next) != NULL){
-            if (elem->key == key) release = max_rel(release, elem->release);
-            elem = elem->next;
-        }
-        if (elem->key == key) release = max_rel(release, elem->release);
-        release++;
-        KeySpace* neww = calloc(1, sizeof(KeySpace));
-        neww->key = key;
-        neww->info = to_input;
-        neww->release = release;
-        neww->next = NULL;
-        elem->next = neww;
+        release = max_rel(elem, key);
+        ins_elem(elem, key, to_input, release);
     }
     return GOOD;
 }
@@ -148,21 +150,24 @@ KeySpace* find(const table_t *table, const unsigned int key){
     if ((table == NULL) || (table->csize == 0)) return NULL;
     unsigned index = hash_func(table, key);
     KeySpace* elem = (table)->ks + index;
-    KeySpace* copy = NULL;
     KeySpace* resault = NULL;
     int count=0;
     if (elem->info == NULL) return NULL;
     while (elem != NULL){
-        if (elem->key == key) count++;
+        if (elem->key == key){
+            count = elem->release + 1; 
+            break;
+        }
         elem = elem->next;
     }
     elem = (table)->ks + index;
     if (count > 0) resault = calloc(count, sizeof(KeySpace));
     else return NULL;
+    int i = 0;
     while (elem != NULL){
         if (elem->key == key){
-            count--;
-            resault[count] = copy_elem(elem);
+            resault[i] = copy_elem(elem);
+            i++;
         }
         elem = elem->next;
     }
@@ -299,10 +304,11 @@ KeySpace* find_special(const table_t *table, const unsigned key, const int relea
     elem = (table)->ks + index;
     if (count == 0) return NULL;
     resault = calloc(count, sizeof(KeySpace));
+    int i=0;
     while (elem != NULL){
         if (elem->key == key){
-            count--;
-            resault[count] = *elem;
+            resault[i] = *elem;
+            i++;
         }
         elem = elem->next;
     }
@@ -324,7 +330,7 @@ void print_and_free_spec(KeySpace* resault, int release){
     }
 }
 
-void flush_list(KeySpace* elem){
+void untrash_list(KeySpace* elem){
     KeySpace* current;
     while (elem != NULL){
         int flag_del = 0;
@@ -347,6 +353,6 @@ int reorganize(table_t* table){
     for (int i = 0; i < table->msize; i++){
         elem = table->ks + i;
         if (elem->info == NULL) continue;
-        flush_list(elem);
+        untrash_list(elem);
     }
 }
