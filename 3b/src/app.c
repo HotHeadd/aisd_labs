@@ -134,7 +134,10 @@ int main(){
                 break;
             case '9':
                 res = reorganize(table);
-                printf("Таблица реогранизована!\n");
+                if (res != GOOD){
+                if (res == NO_TABLE) printf("Таблицы нет!\n");
+                }
+                else printf("Таблица реогранизована!\n");
                 break;
             default:
                 printf("Нет такой опции в меню!\n");
