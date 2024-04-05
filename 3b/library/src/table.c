@@ -151,7 +151,7 @@ KeySpace copy_elem(const KeySpace* elem){
     return res;
 }
 
-KeySpace* find(const table_t *table, const unsigned int key){
+KeySpace* find(const table_t *table, const unsigned int key, int* size){
     if ((table == NULL) || (table->csize == 0)) return NULL;
     unsigned index = hash_func(table, key);
     KeySpace* elem = (table)->ks + index;
@@ -160,17 +160,18 @@ KeySpace* find(const table_t *table, const unsigned int key){
     if (elem->info == NULL) return NULL;
     while (elem != NULL){
         if (elem->key == key){
-            count = elem->release + 1; 
-            break;
+            count++;
         }
         elem = elem->next;
     }
     elem = (table)->ks + index;
     if (count > 0) resault = calloc(count, sizeof(KeySpace));
     else return NULL;
+    *size = count;
     int i = 0;
     while (elem != NULL){
         if (elem->key == key){
+            count--;
             resault[i] = copy_elem(elem);
             i++;
         }
@@ -179,22 +180,21 @@ KeySpace* find(const table_t *table, const unsigned int key){
     return resault;
 }
 
-void free_found(KeySpace* resault){
+void free_found(KeySpace* resault, int size){
     if (resault == NULL) return;
-    int size = resault->release;
-    for (int i=0; i<size+1; i++){
+    for (int i=0; i<size; i++){
         free((resault+i)->info);
     }
     free(resault);
 }
 
-void print_and_free(KeySpace* resault){
+void print_and_free(KeySpace* resault, int size){
     printf("Найденные элементы:\n");
-    for (int i=resault->release; i >= 0; i--){
+    for (int i=0; i<size; i++){
         KeySpace* elem = resault + i;
         printf("|%-10u|%-10u|%2u|\n", elem->key, *elem->info, elem->release);
     }
-    free_found(resault);
+    free_found(resault, size);
 }
 
 int del_elem(KeySpace* elem){
@@ -291,7 +291,7 @@ int from_binary(table_t** table, const char* filename){
     return GOOD;
 }
 
-KeySpace* find_special(const table_t *table, const unsigned key, const int release){
+KeySpace* find_special(const table_t *table, const unsigned key, const int release, int* size){
     if ((table == NULL) || (table->csize == 0)) return NULL;
     unsigned index = hash_func(table, key);
     KeySpace* elem = (table)->ks + index;
@@ -300,7 +300,10 @@ KeySpace* find_special(const table_t *table, const unsigned key, const int relea
     if (elem->info == NULL) return NULL;
     while (elem != NULL){
         if (elem->key == key){
-            if (elem->release == release) return elem;
+            if (elem->release == release){
+                *size = 1;
+                return elem;
+            }
             count++;
         }
         elem = elem->next;
@@ -309,6 +312,7 @@ KeySpace* find_special(const table_t *table, const unsigned key, const int relea
     elem = (table)->ks + index;
     if (count == 0) return NULL;
     resault = calloc(count, sizeof(KeySpace));
+    *size = count;
     int i=0;
     while (elem != NULL){
         if (elem->key == key){
@@ -320,10 +324,10 @@ KeySpace* find_special(const table_t *table, const unsigned key, const int relea
     return resault;
 }
 
-void print_and_free_spec(KeySpace* resault, int release){
+void print_and_free_spec(KeySpace* resault, int release, int size){
     if (release < 0){
         printf("Найденные элементы:\n");
-        for (int i=resault->release; i >= 0; i--){
+        for (int i=0; i<size; i++){
             KeySpace* elem = resault + i;
             printf("|%-10u|%-10u|%2u|\n", elem->key, *elem->info, elem->release);
         }

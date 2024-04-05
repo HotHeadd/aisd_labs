@@ -97,9 +97,9 @@ int main(){
             case '5':
                 res = ask_key(&key);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                ret = find(table, key);
+                ret = find(table, key, &size);
                 if (ret == NULL) printf("Элемент не найден.\n");
-                else print_and_free(ret);
+                else print_and_free(ret, size);
                 break;
             case '6':
                 free(filename);
@@ -128,9 +128,9 @@ int main(){
                 if (res == -1) return eXXit(GOOD, table, filename);
                 res = ask_release(&release);
                 if (res == -1) return eXXit(GOOD, table, filename);
-                ret = find_special(table, key, release);
+                ret = find_special(table, key, release, &size);
                 if (ret == NULL) printf("Элемент не найден.\n");
-                else print_and_free_spec(ret, release);
+                else print_and_free_spec(ret, release, size);
                 break;
             case '9':
                 res = reorganize(table);
