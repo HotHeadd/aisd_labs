@@ -58,8 +58,13 @@ void free_table(table_t* const table){
     free(table);
 }
 
-unsigned hash_func(const table_t* table, const unsigned key){
-    return key%(table->msize);
+unsigned hash_func(const table_t* table, unsigned key){
+    unsigned hash = 4294967295;
+    for (int i=0;i<4;i++){
+        hash = 37*hash + key%256;
+        key = key/256;
+    }
+    return abs(hash)%(table->msize);
 }
 
 int is_prime(int num){
@@ -76,7 +81,7 @@ unsigned simple(unsigned size){
 }
 
 table_t* extend_table(table_t* table){
-    table_t* new_table =  get_table(simple(table->msize*2));
+    table_t* new_table = get_table(simple(table->msize*2));
     for (int i=0;i<table->msize;i++){
         KeySpace* elem = table->ks+i;
         while (elem != NULL){
@@ -224,10 +229,10 @@ int delete(table_t* table, const unsigned key){
     else{
         while (elem != NULL){
             while ((elem != NULL) && (elem->key == key)){
-                del_elem(elem);
+                res = del_elem(elem);
             }
             while ((elem != NULL) && (elem->next != NULL) && (elem->next->info != NULL) && (elem->next->key == key)){
-                del_elem(elem->next);
+                res = del_elem(elem->next);
             }
             if ((elem != NULL) && (elem->next != NULL) && (elem->next->info == NULL)){
                 free(elem->next);
@@ -277,7 +282,7 @@ int from_binary(table_t** table, const char* filename){
     *table = get_table(size);
     while (fread(&key, sizeof(unsigned), 1, input) != 0){
         res = fread(&info, sizeof(unsigned), 1, input);
-        if (res == 0) return  FORMAT_ERROR;
+        if (res == 0) return FORMAT_ERROR;
         insert(table, key, info);
     }
     res = fread(&check, sizeof(char), 1, input);
