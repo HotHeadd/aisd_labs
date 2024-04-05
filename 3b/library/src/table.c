@@ -76,7 +76,7 @@ unsigned simple(unsigned size){
 }
 
 table_t* extend_table(table_t* table){
-    table_t* new_table =  get_table(simple(table->msize));
+    table_t* new_table =  get_table(simple(table->msize*2));
     for (int i=0;i<table->msize;i++){
         KeySpace* elem = table->ks+i;
         while (elem != NULL){
