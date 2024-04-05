@@ -224,10 +224,10 @@ int delete(table_t* table, const unsigned key){
     else{
         while (elem != NULL){
             while ((elem != NULL) && (elem->key == key)){
-                res = del_elem(elem);
+                del_elem(elem);
             }
             while ((elem != NULL) && (elem->next != NULL) && (elem->next->info != NULL) && (elem->next->key == key)){
-                res = del_elem(elem->next);
+                del_elem(elem->next);
             }
             if ((elem != NULL) && (elem->next != NULL) && (elem->next->info == NULL)){
                 free(elem->next);
@@ -330,20 +330,30 @@ void print_and_free_spec(KeySpace* resault, int release){
     }
 }
 
-void untrash_list(KeySpace* elem){
+void untrash_list(KeySpace* elem, table_t* table){
     KeySpace* current;
     while (elem != NULL){
-        int flag_del = 0;
         current = elem->next;
         while (current != NULL){
-            if (current->key == elem->key){
-                del_elem(elem);
-                flag_del = 1;
-                break;
+            while ((current != NULL) && (current->key == elem->key)){
+                del_elem(current);
+            }
+            while ((current != NULL) && (current->next != NULL) && (current->next->info != NULL) && (current->next->key == elem->key)){
+                del_elem(current->next);
+            }
+            if ((current != NULL) && (current->next != NULL) && (current->next->info == NULL)){
+                free(current->next);
+                current->next = NULL;
+            }
+            if ((current != NULL) && (current->info == NULL)){
+                free(current);
+                current = NULL;
+                elem->next = NULL;
+                continue;
             }
             current = current->next;
         }
-        if (flag_del == 0) elem = elem->next;
+        elem = elem->next;
     }
 }
 
@@ -353,6 +363,6 @@ int reorganize(table_t* table){
     for (int i = 0; i < table->msize; i++){
         elem = table->ks + i;
         if (elem->info == NULL) continue;
-        untrash_list(elem);
+        untrash_list(elem, table);
     }
 }
