@@ -10,7 +10,6 @@ int eXXit(int mistake, Node* root, char* filename){
     free_tree(root);
     free(filename);
     return mistake;
-
 }
 
 void menus(){
@@ -56,7 +55,7 @@ int main(){
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
-                print_tree(root, "");
+                print_tree(root, 0);
                 break;
             case '2':
                 break;
@@ -65,7 +64,7 @@ int main(){
                 if (res == -1) return eXXit(GOOD, root, filename);
                 res = insert(&root, key, info);
                 if (res == GOOD) printf("Элемент вставлен.\n");
-                if (res == KEY_EXIST) printf("КЛЮЧ ЕСТЬ\n");
+                if (res == KEY_EXIST) printf("Ключ существует. Вставлен дубликат\n");
                 if (res == ROOT_CREATED) printf("Дерево создано и вставлен элемент.\n");
                 break;
             case '4':

@@ -2,4 +2,4 @@
 
 #include "tree.h"
 
-void print_tree(Node* root, char*);
+void print_tree(Node* root, int);

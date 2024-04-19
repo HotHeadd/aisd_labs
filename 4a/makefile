@@ -37,7 +37,7 @@ $(TARGET): $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(OBJ)
 $(PROJ_OBJ)%.o : $(PROJ_SRC)%.c
 	$(CC) -c $< -o $@ $(ENDFLAGS)
 
-$(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT):
+$(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT): clean # remove clean to turn off auto remake everyting
 	mkdir $(PROJ_OBJ) || true
 	mkdir $(LIB_PREF_OBJ) || true
 	$(CC) $(CFLAGS) $(LIB_PREF_SRC)basic.c -o $(LIB_PREF_OBJ)basic.o $(ENDFLAGS)

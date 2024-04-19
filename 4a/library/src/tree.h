@@ -11,9 +11,14 @@
 #define LAST_ELEMENT 8
 #define END_INPUT -1
 
+typedef struct info_t{
+    struct info_t* next;
+    unsigned value;
+} info_t;
+
 typedef struct Node{
     char* key;
-    unsigned* info;
+    info_t* info;
     struct Node* right;
     struct Node* left;
     struct Node* parent;    
