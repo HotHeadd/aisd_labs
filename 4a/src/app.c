@@ -85,6 +85,13 @@ int main(){
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
                 break;
             case '9':
+                free(filename);
+                filename = readline("Введите имя файла, из которого нужно взять дерево: ");
+                if (filename == NULL) return eXXit(GOOD, root, filename);
+                res = tree_from_txt(&root, filename);
+                if (res == GOOD) printf("Дерево считано\n");
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
+                if (res == FORMAT_ERROR) printf("Ошибка формата данных\n");
                 break;
             default:
                 printf("Нет такой опции в меню!\n");

@@ -2,7 +2,7 @@
 #include "tree_io.h"
 #include <stdio.h>
 
-void put_data(Node* root){
+void put_data(const Node* root){
     printf("{%s}: [", root->key);
     info_t* elem = root->info;
     int start = 1;
@@ -16,7 +16,7 @@ void put_data(Node* root){
     return;
 }
 
-void print_tree(Node* root, int level){
+void print_tree(const Node* root, const int level){
     if (level == 0) printf("Здравствуйте, ваше дерево:\n");
     if (root == NULL){
         if (level != 0){
@@ -31,7 +31,7 @@ void print_tree(Node* root, int level){
     print_tree(root->left, level + 1);
     print_tree(root->right, level + 1);
 }
-int txt_out_rec(Node* root, char* filename){
+int txt_out_rec(const Node* root, const char* filename){
     if (root == NULL) return NO_TREE;
     FILE* output = fopen(filename, "a");
     int count = 1;
@@ -50,8 +50,20 @@ int txt_out_rec(Node* root, char* filename){
     return GOOD;
 }
 
-int tree_to_txt(Node* root, char* filename){
+int tree_to_txt(const Node* root, const char* filename){
     FILE* output = fopen(filename, "w");
     if (output == NULL) return FILE_ERROR;
     return txt_out_rec(root, filename);
+}
+
+int tree_from_txt(Node** root, const char* filename){
+    free_tree(*root);
+    *root = NULL;
+    FILE* output = fopen(filename, "r");
+    if (output == NULL) return FILE_ERROR;
+    char* key;
+    unsigned info;
+    int res = 0;
+    // while (fscanf)
+    return GOOD;
 }
