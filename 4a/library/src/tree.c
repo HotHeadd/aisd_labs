@@ -4,6 +4,7 @@
 #include "tree.h"
 
 void free_tree(Node* root){
+    if (root == NULL) return;
     if (root->left != NULL) free_tree(root->left);
     if (root->right != NULL) free_tree(root->right);
     free(root->key);

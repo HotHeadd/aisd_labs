@@ -64,7 +64,10 @@ int main(){
                 if (res == -1) return eXXit(GOOD, root, filename);
                 res = insert(&root, key, info);
                 if (res == GOOD) printf("Элемент вставлен.\n");
-                if (res == KEY_EXIST) printf("Ключ существует. Вставлен дубликат\n");
+                if (res == KEY_EXIST){
+                    free(key);
+                    printf("Ключ существует. Вставлен дубликат\n");
+                }
                 if (res == ROOT_CREATED) printf("Дерево создано и вставлен элемент.\n");
                 break;
             case '4':
