@@ -1,9 +1,19 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "tree.h"
 
 void free_tree(Node* root){
-    return;
+    if (root->left != NULL) free_tree(root->left);
+    if (root->right != NULL) free_tree(root->right);
+    free(root->key);
+    info_t* prev = root->info;
+    while (root->info != NULL){
+        root->info = root->info->next;
+        free(prev);
+        prev = root->info;
+    }
+    free(root);
 }
 
 void addinfo(Node* root, unsigned info){

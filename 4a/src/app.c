@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "../library/src/basic.h"
 #include "../library/src/tree.h"
-#include "../library/src/tree_gr.h"
+#include "../library/src/tree_io.h"
 
 int eXXit(int mistake, Node* root, char* filename){
     printf("Выхожу...\n");
@@ -76,8 +76,16 @@ int main(){
             case '7':
                 break;
             case '8':
+                free(filename);
+                filename = readline("Введите имя файла, в который нужно поместить дерево: ");
+                if (filename == NULL) return eXXit(GOOD, root, filename);
+                res = tree_to_txt(root, filename);
+                if (res == GOOD) printf("Дерево записано\n");
+                if (res == NO_TREE) printf("Дерева нет нет!\n");
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
                 break;
-            
+            case '9':
+                break;
             default:
                 printf("Нет такой опции в меню!\n");
         }
