@@ -36,6 +36,7 @@ void print_tree(const Node* root, const int level){
 }
 
 void traversal(const Node* root, FILE* stream){
+    if (root == NULL) return;
     if (root->right != NULL)
         traversal(root->right, stream);
     put_data(root, stream);

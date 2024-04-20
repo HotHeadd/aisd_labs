@@ -116,7 +116,8 @@ int delete(Node** root, char* key){
             parent->left = child;
         if (parent->right == elem)
             parent->right = child;
-        child->parent = parent;
+        if (child != NULL)
+            child->parent = parent;
     }
     free_elem(elem, 1);
     return GOOD;
