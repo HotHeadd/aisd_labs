@@ -4,17 +4,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-void put_data(const Node* root){
-    printf("{%s}: [", root->key);
+void put_data(const Node* root, FILE* stream){
+    fprintf(stream, "{%s}: [", root->key);
     info_t* elem = root->info;
     int start = 1;
     while (elem != NULL){
         if (start) start -= 1;
-        else printf(", ");
-        printf("%u", elem->value);
+        else fprintf(stream, ", ");
+        fprintf(stream, "%u", elem->value);
         elem = elem->next;
     }
-    printf("]\n");
+    fprintf(stream, "]\n");
     return;
 }
 
@@ -29,14 +29,22 @@ void print_tree(const Node* root, const int level){
     }
     for (int i = 0; i < level; i++)
         printf(i == level - 1 ? "|-> " : "    ");
-    put_data(root);
+    put_data(root, stdout);
     print_tree(root->left, level + 1);
     print_tree(root->right, level + 1);
 }
 
+void traversal(Node* root, FILE* stream){
+    if (root->right != NULL)
+        traversal(root->right, stream);
+    put_data(root, stream);
+    if (root->left != NULL)
+        traversal(root->left, stream);
+}
+
 void print_found(Node* found){
     printf("Найденный элемент: ");
-    put_data(found);
+    put_data(found, stdout);
     return;
 }
 

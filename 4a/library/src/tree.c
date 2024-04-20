@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tree.h"
-#include <stdio.h>
 
 void free_elem(Node* root, int delroot){
     free(root->key);

@@ -93,6 +93,7 @@ int main(){
             case '6':
                 break;
             case '7':
+                traversal(root, stdout);
                 break;
             case '8':
                 free(filename);
