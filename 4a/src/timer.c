@@ -23,10 +23,12 @@ char* get_key(){
 void get_tree(Node** root, int elems){
     char* key;
     unsigned info;
+    int res;
     for (int j = 0; j<elems; j++){
         key = get_key();
         info = (unsigned)rand();
-        insert(root, key, info);
+        res = insert(root, key, info);
+        if (res == KEY_EXIST) free(key);
     }
 }
 
