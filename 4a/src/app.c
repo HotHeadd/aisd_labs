@@ -18,22 +18,22 @@ void menus(){
     printf("(2) Вывести дерево (графический)\n");
     printf("(3) Вставить элемент в дерево\n");
     printf("(4) Удалить элемент из дерева\n");
-    printf("(5) Обход дерева (в обратном порядке)\n");
-    printf("(6) Поиск в дереве по ключу\n");
-    printf("(7) Специальный поиск (максимально отличается от заданного)\n");
+    printf("(5) Поиск в дереве по ключу\n");
+    printf("(6) Специальный поиск (максимально отличается от заданного)\n");
+    printf("(7) Обход дерева (в обратном порядке)\n");
     printf("(8) Записать дерево в текстовый файл\n");
     printf("(9) Получить дерево из текстового файла\n");
     printf("--> ");
 }
 
-int ask_key(unsigned *key){
-    printf("Введите ключ: ");
-    int res = custom_int_input(key, o_n_and_0);
-    if (res == -1) return END_INPUT;
-    return GOOD;
+char* ask_key(){
+    char* key;
+    key = readline("Введите ключ: ");
+    if (key == NULL) return NULL;
+    return key;
 }
 
-int ask_elem(char** key, unsigned*info){
+int ask_elem(char** key, unsigned* info){
     char* keyin;
     int res;
     *key = readline("Введите ключ: ");
@@ -51,6 +51,7 @@ int main(){
     int res = 0;
     char* filename = NULL;
     Node* root = NULL;
+    Node* found;
     menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){
@@ -71,8 +72,23 @@ int main(){
                 if (res == ROOT_CREATED) printf("Дерево создано и вставлен элемент.\n");
                 break;
             case '4':
+                key = ask_key();
+                if (key == NULL) return eXXit(GOOD, root, filename);
+                res = delete(&root, key);
+                free(key);
+                if (res == GOOD) printf("Элемент удален.\n");
+                if (res == MULTIPLE_DATA){
+                    printf("Несколько элементов по этому ключу. Удален старейший дубликат\n");
+                }
+                if (res == ELEM_NOT_FOUND) printf("Элемента нет в дереве.\n");
                 break;
             case '5':
+                key = ask_key();
+                if (key == NULL) return eXXit(GOOD, root, filename);
+                found = find(root, key);
+                free(key);
+                if (found != NULL) print_found(found);
+                if (found == NULL) printf("Элемент не найден.\n");
                 break;
             case '6':
                 break;

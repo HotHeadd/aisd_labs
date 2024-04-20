@@ -1,12 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "tree.h"
 
-void free_tree(Node* root){
-    if (root == NULL) return;
-    if (root->left != NULL) free_tree(root->left);
-    if (root->right != NULL) free_tree(root->right);
+void free_elem(Node* root){
     free(root->key);
     info_t* prev = root->info;
     while (root->info != NULL){
@@ -15,6 +11,13 @@ void free_tree(Node* root){
         prev = root->info;
     }
     free(root);
+}
+
+void free_tree(Node* root){
+    if (root == NULL) return;
+    if (root->left != NULL) free_tree(root->left);
+    if (root->right != NULL) free_tree(root->right);
+    free_elem(root);
 }
 
 void addinfo(Node* root, unsigned info){
@@ -64,4 +67,35 @@ int insert(Node** root, char* key, unsigned info){
         }
         return insert(&((*root)->right), key, info);
     }
+}
+
+Node* find(Node* root, char* key){
+    if (root == NULL) return NULL;
+    int compare = strcmp(key, root->key);
+    if (compare == 0) return root;
+    if (compare < 0) return find(root->left, key);
+    return find(root->right, key);
+}
+
+int delete(Node** root, char* key){
+    Node* elem = find(*root, key);
+    if (elem == NULL) return ELEM_NOT_FOUND;
+    if (elem->info->next != NULL){
+        info_t* data = elem->info;
+        elem->info = elem->info->next;
+        free(data);
+        return MULTIPLE_DATA;
+    }
+    Node* parent = elem->parent;
+    Node* child = elem->right;
+    if (elem->left != NULL) 
+        child = elem->left;
+    if (parent->left == elem){
+        parent->left = child;
+    }
+    if (parent->right == elem){
+        parent->right = child;
+    }
+    free_elem(elem);
+    return GOOD;
 }

@@ -7,7 +7,7 @@
 #define FILE_ERROR 4 
 #define FORMAT_ERROR 5
 #define NO_TREE 6
-#define EOTABLE 7
+#define MULTIPLE_DATA 7
 #define LAST_ELEMENT 8
 #define END_INPUT -1
 
@@ -24,5 +24,8 @@ typedef struct Node{
     struct Node* parent;    
 } Node;
 
-int insert(Node** root, char* key, unsigned info);
 void free_tree(Node* root);
+
+int insert(Node** root, char* key, unsigned info);
+Node* find(Node* root, char* key);
+int delete(Node** root, char* key);

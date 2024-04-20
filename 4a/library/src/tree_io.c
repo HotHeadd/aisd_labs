@@ -33,6 +33,13 @@ void print_tree(const Node* root, const int level){
     print_tree(root->left, level + 1);
     print_tree(root->right, level + 1);
 }
+
+void print_found(Node* found){
+    printf("Найденный элемент: ");
+    put_data(found);
+    return;
+}
+
 int txt_out_rec(const Node* root, const char* filename){
     if (root == NULL) return NO_TREE;
     FILE* output = fopen(filename, "a");
