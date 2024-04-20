@@ -1,8 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tree.h"
+#include <stdio.h>
 
-void free_elem(Node* root){
+void free_elem(Node* root, int delroot){
     free(root->key);
     info_t* prev = root->info;
     while (root->info != NULL){
@@ -10,14 +11,14 @@ void free_elem(Node* root){
         free(prev);
         prev = root->info;
     }
-    free(root);
+    if (delroot) free(root);
 }
 
 void free_tree(Node* root){
     if (root == NULL) return;
     if (root->left != NULL) free_tree(root->left);
     if (root->right != NULL) free_tree(root->right);
-    free_elem(root);
+    free_elem(root, 1);
 }
 
 void addinfo(Node* root, unsigned info){
@@ -87,15 +88,35 @@ int delete(Node** root, char* key){
         return MULTIPLE_DATA;
     }
     Node* parent = elem->parent;
-    Node* child = elem->right;
-    if (elem->left != NULL) 
-        child = elem->left;
-    if (parent->left == elem){
-        parent->left = child;
+    Node* child = elem->right == NULL ? elem->left : elem->right;
+    if (((elem->left != NULL) && (elem->right != NULL))){
+        Node* minimum = elem->right;
+        while (minimum->left != NULL)
+            minimum = minimum->left;
+        free_elem(elem, 0);
+        elem->key = minimum->key;
+        elem->info = minimum->info;
+        if (minimum->parent != elem){
+            minimum->parent->left = minimum->right;
+            if (minimum->right != NULL)
+                minimum->right->parent = minimum->parent;
+        }
+        else
+            elem->right = minimum->right;
+            if (minimum->right != NULL)
+                minimum->right->parent = minimum->parent;
+        free(minimum);
+        return GOOD;
     }
-    if (parent->right == elem){
-        parent->right = child;
+    if (parent == NULL)
+        *root = child;
+    else{
+        if (parent->left == elem)
+            parent->left = child;
+        if (parent->right == elem)
+            parent->right = child;
+        child->parent = parent;
     }
-    free_elem(elem);
+    free_elem(elem, 1);
     return GOOD;
 }
