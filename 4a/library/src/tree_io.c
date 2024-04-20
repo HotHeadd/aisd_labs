@@ -36,13 +36,10 @@ void print_tree(const Node* root, const int level){
 int txt_out_rec(const Node* root, const char* filename){
     if (root == NULL) return NO_TREE;
     FILE* output = fopen(filename, "a");
-    int count = 1;
     info_t* elem = root->info;
-    while ((elem=elem->next) != NULL) count++;
     elem = root->info;
-    fprintf(output, "%s\n", root->key);
-    fprintf(output, "%d\n", count);
     while (elem != NULL){
+        fprintf(output, "%s\n", root->key);
         fprintf(output, "%d\n", elem->value);
         elem = elem->next;
     }
@@ -95,20 +92,13 @@ int tree_from_txt(Node** root, const char* filename){
     int count = 0;
     int res = 0;
     while ((key = file_readline(input)) != NULL){
-        res = fscanf(input, "%d", &count);
+        res = fscanf(input, "%u", &info);
         if (res == 0){
             free_tree(*root);
             return FILE_ERROR;
         }
-        for (int _=0; _ < count; _++){
-            res = fscanf(input, "%u", &info);
-            if (res == 0){
-                free_tree(*root);
-                return FILE_ERROR;
-            }
-            insert(root, key, info);
-            fscanf(input, "%*c");
-        }
+        if (insert(root, key, info) == KEY_EXIST) free(key);
+        fscanf(input, "%*c");
     }
     fclose(input);
     return GOOD;
