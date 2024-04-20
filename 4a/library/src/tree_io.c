@@ -1,8 +1,8 @@
-#include "tree.h"
-#include "tree_io.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include "tree.h"
+#include "tree_io.h"
+#include "basic.h"
 
 void put_data(const Node* root, FILE* stream){
     fprintf(stream, "{%s}: [", root->key);
@@ -34,7 +34,7 @@ void print_tree(const Node* root, const int level){
     print_tree(root->right, level + 1);
 }
 
-void traversal(Node* root, FILE* stream){
+void traversal(const Node* root, FILE* stream){
     if (root->right != NULL)
         traversal(root->right, stream);
     put_data(root, stream);
@@ -42,7 +42,7 @@ void traversal(Node* root, FILE* stream){
         traversal(root->left, stream);
 }
 
-void print_found(Node* found){
+void print_found(const Node* found){
     printf("Найденный элемент: ");
     put_data(found, stdout);
     return;
@@ -69,32 +69,6 @@ int tree_to_txt(const Node* root, const char* filename){
     if (output == NULL) return FILE_ERROR;
     fclose(output);
     return txt_out_rec(root, filename);
-}
-
-char* file_readline(FILE* file){ //достаю из широких штанин функцию из 4 лабы
-    int s_len, b_len, res = 1, no_action = 1;
-    char *str = (char*)calloc(1, sizeof(char));
-    char *buff = calloc(5, sizeof(char));
-    res = fscanf(file, "%4[^\n]", buff);
-    if (res == -1) {free(buff); free(str); return NULL;}
-    while (buff[0] && res!= 0){
-            no_action = 0;
-            if (res == -1) return NULL;
-            if (str) s_len = strlen(str); else s_len = 0;
-            if (buff) b_len = strlen(buff); else b_len = 0;
-            str = (char*)realloc(str, (s_len+b_len)*sizeof(char)+1);
-            strcat(str, buff);
-            *(str+s_len+b_len) = '\0';
-            res = fscanf(file, "%4[^\n]", buff);
-    }
-    if (buff != NULL) free(buff);
-    fscanf(file, "%*c");
-    if (no_action){
-            free(str);
-            str = calloc(7, sizeof(char));
-            strcat(str, "(null)");
-    }
-    return str;
 }
 
 int tree_from_txt(Node** root, const char* filename){

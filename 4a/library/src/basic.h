@@ -9,3 +9,4 @@ int InputArray(int **poin);
 int OutputArray(int *data, int len);
 char better_getchar();
 int closest_two(int);
+char* file_readline(FILE* file);

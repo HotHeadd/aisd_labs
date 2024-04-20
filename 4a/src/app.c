@@ -91,6 +91,12 @@ int main(){
                 if (found == NULL) printf("Элемент не найден.\n");
                 break;
             case '6':
+                key = ask_key();
+                if (key == NULL) return eXXit(GOOD, root, filename);
+                found = special_find(root, key);
+                free(key);
+                if (found != NULL) print_found(found);
+                if (found == NULL) printf("Пустое дерево.\n");
                 break;
             case '7':
                 traversal(root, stdout);

@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tree.h"
+#include <math.h>
+#include <stdio.h>
 
 void free_elem(Node* root, int delroot){
     free(root->key);
@@ -69,7 +71,7 @@ int insert(Node** root, char* key, unsigned info){
     }
 }
 
-Node* find(Node* root, char* key){
+Node* find(Node* root, const char* key){
     if (root == NULL) return NULL;
     int compare = strcmp(key, root->key);
     if (compare == 0) return root;
@@ -118,4 +120,32 @@ int delete(Node** root, char* key){
     }
     free_elem(elem, 1);
     return GOOD;
+}
+
+
+int mycomp(char* first, char* second){
+    int len1 = strlen(first);
+    int len2 = strlen(second);
+    int iter = (int)fmin(len1, len2);
+    for (int i=0; i < iter; i++){
+        if (first[i] != second[i])
+            return first[i] - second[i];
+    }
+    if (len1 > len2)
+        return first[iter];
+    if (len1 < len2)
+        return second[iter];
+    else return 0;
+}
+
+Node* special_find(Node* root, char* key){
+    if (root == NULL) return NULL;
+    Node* lelem = root, *relem = root;
+    while (relem->right != NULL)
+        relem = relem->right;
+    while (lelem->left != NULL)
+        lelem = lelem->left;
+    if (mycomp(key, lelem->key) > mycomp(relem->key, key))
+        return lelem;
+    return relem;
 }

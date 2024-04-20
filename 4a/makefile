@@ -3,7 +3,7 @@ LIBNAME = my
 ENDFLAGS = -lm -lreadline -g # -D $(KEYWORD)
 CC = gcc
 
-.PHONY: lib final dirs
+.PHONY: lib final dirs rmlib app
 
 LIB_LOCATION = ./library
 LIB_PREF_SRC = $(LIB_LOCATION)/src/
@@ -36,8 +36,8 @@ LIB_OBJ = $(patsubst $(LIB_PREF_SRC)%.c, $(LIB_PREF_OBJ)%.o, $(LIB_SRC))
 
 final: clean dirs $(TARGET) # remove clean to turn off auto remake everyting
 
-$(TARGET): $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(OBJ) 
-	$(CC) -o $(TARGET) $(PROJ_OBJ)*.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
+app: $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(OBJ) 
+	$(CC) -o app $(PROJ_OBJ)*.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
 $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT): $(LIB_OBJ)
 	$(LEFT) $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(LIB_PREF_OBJ)*.o
@@ -57,8 +57,9 @@ lib: rmlib $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT)
 clean: rmlib
 	@rm -f $(PROJ_OBJ)*.o $(TARGET) || true
 	@rm -f vgcore* || true
-	@rm -f -d obj ./library/obj
+	@rm -f -d obj
 	
 rmlib:
 	@rm -f $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) || true
 	@rm -f $(LIB_LOCATION)/obj/*.o || true
+	@rm -f -d $(LIB_PREF_OBJ)
