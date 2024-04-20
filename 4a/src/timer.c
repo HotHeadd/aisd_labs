@@ -113,11 +113,11 @@ int main(){
         FILE* input = fopen(filename, "w");
         fclose(input);
         for (int i=1; i<=20; i++){
-            elems = i*10;
+            elems = i*10000;
             if (func == 3) elems /= 10;
             time_sum = timer(func, elems);
             FILE* input = fopen(filename, "a");
-            fprintf(input, "%d %.8lf\n", elems, time_sum);
+            fprintf(input, "%d %.4lf\n", elems, time_sum*1000);
             fclose(input);
         }
         if (func == 3) remove("filler.txt");
