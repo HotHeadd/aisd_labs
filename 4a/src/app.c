@@ -59,6 +59,7 @@ int main(){
                 print_tree(root, 0);
                 break;
             case '2':
+                print_gv(root);
                 break;
             case '3':
                 ask_elem(&key, &info);

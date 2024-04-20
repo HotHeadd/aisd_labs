@@ -1,6 +1,6 @@
 TARGET = app
 LIBNAME = my
-ENDFLAGS = -lm -lreadline -g # -D $(KEYWORD)
+ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc # -D $(KEYWORD)
 CC = gcc
 
 .PHONY: lib final dirs rmlib app

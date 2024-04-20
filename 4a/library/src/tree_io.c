@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <graphviz/gvc.h>
 #include "tree.h"
 #include "tree_io.h"
 #include "basic.h"
@@ -91,4 +92,17 @@ int tree_from_txt(Node** root, const char* filename){
     }
     fclose(input);
     return GOOD;
+}
+
+void print_gv(Node* root){
+    // %20 space
+    // %7B {
+    // %7D }
+    // -%3E ->
+    // %22 "
+    char* link = "https://dotrend.dozen.mephi.ru/?dot=digraph%20G%20%7B";
+    char* example = "https://dotrend.dozen.mephi.ru/?dot=digraph%20G%20%7B%22A%20asd%22-%3EB%7D";
+    char* end = "%7D";
+    printf("%s\n", link);
+    return;
 }

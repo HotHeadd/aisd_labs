@@ -8,5 +8,7 @@ void traversal(const Node*, FILE* stream);
 
 void print_found(const Node* found);
 
+void print_gv(Node* root);
+
 int tree_to_txt(const Node* root, const char* filename);
 int tree_from_txt(Node** root, const char* filename);
