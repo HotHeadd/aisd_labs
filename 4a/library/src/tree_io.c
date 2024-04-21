@@ -112,19 +112,33 @@ int tree_from_txt(Node** root, const char* filename){
     return GOOD;
 }
 
+void fill_tree(Agraph_t* tree, Node* root){
+    Agnode_t *first, *second;
+    Agedge_t *edge;
+    first = agnode(tree, root->key, 1);
+    if (root->left != NULL){
+        second = agnode(tree, root->left->key, 1);
+        edge = agedge(tree, first, second, 0, 1);
+        fill_tree(tree, root->left);
+    }
+    if (root->right != NULL){
+        second = agnode(tree, root->right->key, 1);
+        edge = agedge(tree, first, second, 0, 1);
+        fill_tree(tree, root->right);
+    }
+}
+
 void print_gv(Node* root){
     Agraph_t *tree = agopen("tree", Agdirected, 0);
-    Agnode_t *n = agnode(tree, "n", 1);
-    Agnode_t *m = agnode(tree, "b", 1);
-    Agedge_t *edge = agedge(tree, n, m, 0, 1);
+    fill_tree(tree, root);
     // Just write the graph without layout
     FILE* filler = fopen("filler.gv", "w");
     agwrite(tree, filler);
+    agclose(tree);
     fclose(filler);
     system("dot -Tpng filler.gv -o image.png");
-    system("imview image.png ");
+    system("imview image.png "); // просмотр изображения
     remove("filler.gv");
     remove("image.png");
-    agclose(tree);
     return;
 }
