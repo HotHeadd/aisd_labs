@@ -113,49 +113,18 @@ int tree_from_txt(Node** root, const char* filename){
 }
 
 void print_gv(Node* root){
-    // %20 space
-    // %7B {
-    // %7D }
-    // -%3E ->
-    // %22 "
-    char* link = "https://dotrend.dozen.mephi.ru/?dot=digraph%20G%20%7B";
-    char* example = "https://dotrend.dozen.mephi.ru/?dot=digraph%20G%20%7B%22A%20asd%22-%3EB%7D";
-    char* end = "%7D";
-    printf("%s\n", example);
-
-    // #define NO_LAYOUT_OR_RENDERING
-    
-    // int main(void) {
-    // #ifndef NO_LAYOUT_OR_RENDERING
-    // // set up a graphviz context - but only once even for multiple graphs
-    // GVC_t *gvc = gvContext();
-    // #endif
-
-    // // Create a simple digraph
-    // Agraph_t *g = agopen("g", Agdirected, 0);
-    // Agnode_t *n = agnode(g, "n", 1);
-    // Agnode_t *m = agnode(g, "m", 1);
-    // Agedge_t *e = agedge(g, n, m, 0, 1);
-
-    // // Set an attribute - in this case one that affects the visible rendering
-    // agsafeset(n, "color", "red", "");
-
-    // #ifdef NO_LAYOUT_OR_RENDERING
-    // // Just write the graph without layout
-    // agwrite(g, stdout);
-    // #else
-    // // Use the directed graph layout engine
-    // gvLayout(gvc, g, "dot");
-
-    // // Output in .dot format
-    // gvRender(gvc, g, "dot", stdout);
-
-    // gvFreeLayout(gvc, g);
-    // #endif
-
-    // agclose(g);
-
-    // return EXIT_SUCCESS;
-    // }
+    Agraph_t *tree = agopen("tree", Agdirected, 0);
+    Agnode_t *n = agnode(tree, "n", 1);
+    Agnode_t *m = agnode(tree, "b", 1);
+    Agedge_t *edge = agedge(tree, n, m, 0, 1);
+    // Just write the graph without layout
+    FILE* filler = fopen("filler.gv", "w");
+    agwrite(tree, filler);
+    fclose(filler);
+    system("dot -Tpng filler.gv -o image.png");
+    system("imview image.png ");
+    remove("filler.gv");
+    remove("image.png");
+    agclose(tree);
     return;
 }

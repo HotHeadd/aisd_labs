@@ -1,6 +1,6 @@
 TARGET = app
 LIBNAME = my
-ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc # -D $(KEYWORD)
+ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc# -D $(KEYWORD)
 CC = gcc
 
 .PHONY: lib final clean rmlib rmproj
