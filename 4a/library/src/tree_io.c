@@ -171,7 +171,7 @@ void print_gv(Node* root){
     agclose(tree);
     fclose(filler);
     system("dot -Tpng filler.gv -o image.png");
-    system("imview image.png "); // просмотр изображения
+    system("eog image.png "); // просмотр изображения
     remove("filler.gv");
     remove("image.png");
     return;
