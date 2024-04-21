@@ -5,9 +5,9 @@
 #include "../library/src/tree.h"
 #include "../library/src/tree_io.h"
 
-int eXXit(int mistake, Node* root, char* filename){
+int eXXit(int mistake, Tree* root, char* filename){
     printf("Выхожу...\n");
-    free_tree(root);
+    free_tree(tree);
     free(filename);
     return mistake;
 }
@@ -50,21 +50,21 @@ int main(){
     unsigned info;
     int res = 0;
     char* filename = NULL;
-    Node* root = NULL;
+    Tree* tree = NULL;
     Node* found;
     menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
-                print_tree(root, 0);
+                print_tree(tree, 0);
                 break;
             case '2':
-                print_gv(root);
+                print_gv(tree);
                 break;
             case '3':
                 ask_elem(&key, &info);
-                if (res == -1) return eXXit(GOOD, root, filename);
-                res = insert(&root, key, info);
+                if (res == -1) return eXXit(GOOD, tree, filename);
+                res = insert(tree, key, info);
                 if (res == GOOD) printf("Элемент вставлен.\n");
                 if (res == KEY_EXIST){
                     free(key);
@@ -74,8 +74,8 @@ int main(){
                 break;
             case '4':
                 key = ask_key();
-                if (key == NULL) return eXXit(GOOD, root, filename);
-                res = delete(&root, key);
+                if (key == NULL) return eXXit(GOOD, tree, filename);
+                res = delete(tree, key);
                 free(key);
                 if (res == GOOD) printf("Элемент удален.\n");
                 if (res == MULTIPLE_DATA){
@@ -85,28 +85,28 @@ int main(){
                 break;
             case '5':
                 key = ask_key();
-                if (key == NULL) return eXXit(GOOD, root, filename);
-                found = find(root, key);
+                if (key == NULL) return eXXit(GOOD, tree, filename);
+                found = find(tree, key);
                 free(key);
                 if (found != NULL) print_found(found);
                 if (found == NULL) printf("Элемент не найден.\n");
                 break;
             case '6':
                 key = ask_key();
-                if (key == NULL) return eXXit(GOOD, root, filename);
-                found = special_find(root, key);
+                if (key == NULL) return eXXit(GOOD, tree, filename);
+                found = special_find(tree, key);
                 free(key);
                 if (found != NULL) print_found(found);
                 if (found == NULL) printf("Пустое дерево.\n");
                 break;
             case '7':
-                traversal(root, stdout, 0);
+                traversal(tree, stdout, 0);
                 break;
             case '8':
                 free(filename);
                 filename = readline("Введите имя файла, в который нужно поместить дерево: ");
-                if (filename == NULL) return eXXit(GOOD, root, filename);
-                res = tree_to_txt(root, filename);
+                if (filename == NULL) return eXXit(GOOD, tree, filename);
+                res = tree_to_txt(tree, filename);
                 if (res == GOOD) printf("Дерево записано\n");
                 if (res == NO_TREE) printf("Дерева нет нет!\n");
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
@@ -114,8 +114,8 @@ int main(){
             case '9':
                 free(filename);
                 filename = readline("Введите имя файла, из которого нужно взять дерево: ");
-                if (filename == NULL) return eXXit(GOOD, root, filename);
-                res = tree_from_txt(&root, filename);
+                if (filename == NULL) return eXXit(GOOD, tree, filename);
+                res = tree_from_txt(tree, filename);
                 if (res == GOOD) printf("Дерево считано\n");
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
                 if (res == FORMAT_ERROR) printf("Ошибка формата данных\n");
@@ -125,5 +125,5 @@ int main(){
         }
         menus();
     }
-    return eXXit(GOOD, root, filename);
+    return eXXit(GOOD, tree, filename);
 }

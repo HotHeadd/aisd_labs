@@ -32,7 +32,7 @@ int main(){
     FILE* input = fopen(filename, "r");
     if (input == NULL){
         printf("Ошибка файла\n");
-        return 0;
+        return eXXit(GOOD, root, filename);;
     }
     Node* elem;
     char letter;
@@ -68,7 +68,7 @@ int main(){
     FILE* output = fopen(filename, "w");
     if (output == NULL){
         printf("Ошибка файла\n");
-        return 0;
+        return eXXit(GOOD, root, filename);;
     }
     traversal(root, output, 0);
     fclose(output);

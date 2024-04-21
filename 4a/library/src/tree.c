@@ -15,11 +15,16 @@ void free_elem(Node* root, int delroot){
     if (delroot) free(root);
 }
 
-void free_tree(Node* root){
+void free_root(Node* root){
     if (root == NULL) return;
     if (root->left != NULL) free_tree(root->left);
     if (root->right != NULL) free_tree(root->right);
     free_elem(root, 1);
+}
+
+void free_tree(Tree* tree){
+    Node* root = tree->root;
+    free_root(root);
 }
 
 void addinfo(Node* root, unsigned info){

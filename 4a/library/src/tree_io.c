@@ -164,16 +164,18 @@ void fill_agraph(Agraph_t* tree, Node* root){
 
 void print_gv(Node* root){
     if (root == NULL) return;
+    GVC_t *gvc = gvContext();
     Agraph_t *tree = agopen("tree", Agdirected, 0);
     fill_agraph(tree, root);
-    // Just write the graph without layout
-    FILE* filler = fopen("filler.gv", "w");
-    agwrite(tree, filler);
+    gvLayout(gvc, tree, "dot");
+    FILE* out = fopen("image.svg", "w");
+    gvRender(gvc, tree, "svg", out); // это даёт какую-то тонну утечек памяти и я не знаю как это исправить
+    fclose(out);
+    // system("dot -Tpng filler.gv -o image.png");
+    system("nomacs image.svg -m frameless"); // просмотр изображения
+    remove("image.svg");
+    gvFreeLayout(gvc, tree);
     agclose(tree);
-    fclose(filler);
-    system("dot -Tpng filler.gv -o image.png");
-    system("nomacs image.png -m frameless 1>/dev/null"); // просмотр изображения
-    remove("filler.gv");
-    remove("image.png");
+    gvFreeContext(gvc);
     return;
 }

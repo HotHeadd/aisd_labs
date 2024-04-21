@@ -24,10 +24,14 @@ typedef struct Node{
     struct Node* parent;    
 } Node;
 
+typedef struct Tree{
+    Node* root;
+} Tree;
+
 void free_tree(Node* root);
 
-int insert(Node** root, char* key, unsigned info);
-Node* find(Node* root, const char* key);
-int delete(Node** root, char* key);
+int insert(Tree* tree, char* key, unsigned info);
+Node* find(Tree* tree, const char* key);
+int delete(Tree* tree, char* key);
 
-Node* special_find(Node* root, char* key);
+Node* special_find(Tree* tree, char* key);
