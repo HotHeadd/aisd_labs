@@ -1,4 +1,4 @@
-TARGET = timer
+TARGET = app
 LIBNAME = my
 ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc # -D $(KEYWORD)
 CC = gcc
@@ -66,7 +66,7 @@ clean : rmlib rmproj
 rmproj:
 	@rm -f $(PROJ_OBJ)*.o app timer count
 	@rm -f vgcore*
-	@rm -f -d obj
+	@rm -f -d $(PROJ_OBJ)
 	
 rmlib:
 	@rm -f $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT)

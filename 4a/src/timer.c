@@ -76,7 +76,7 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 FILE* filler = fopen("filler.txt", "w");
                 start = clock();
-                traversal(root, filler);
+                traversal(root, filler, 0);
                 end = clock();
                 fclose(filler);
                 time_sum += (double) (end - start);

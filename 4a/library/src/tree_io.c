@@ -19,6 +19,20 @@ void put_data(const Node* root, FILE* stream){
     return;
 }
 
+void put_data_simple(const Node* root, FILE* stream){
+    fprintf(stream, "%s -- ", root->key);
+    info_t* elem = root->info;
+    int start = 1;
+    while (elem != NULL){
+        if (start) start -= 1;
+        else fprintf(stream, " ");
+        fprintf(stream, "%u", elem->value);
+        elem = elem->next;
+    }
+    fprintf(stream, "\n");
+    return;
+}
+
 void print_tree(const Node* root, const int level){
     if (level == 0) printf("Здравствуйте, ваше дерево:\n");
     if (root == NULL){
@@ -35,13 +49,16 @@ void print_tree(const Node* root, const int level){
     print_tree(root->right, level + 1);
 }
 
-void traversal(const Node* root, FILE* stream){
+void traversal(const Node* root, FILE* stream, int mode){
     if (root == NULL) return;
     if (root->right != NULL)
-        traversal(root->right, stream);
-    put_data(root, stream);
+        traversal(root->right, stream, mode);
+    if (mode == 1) 
+        put_data(root, stream);
+    if (mode == 0) 
+        put_data_simple(root, stream);
     if (root->left != NULL)
-        traversal(root->left, stream);
+        traversal(root->left, stream, mode);
 }
 
 void print_found(const Node* found){

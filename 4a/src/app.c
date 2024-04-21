@@ -100,7 +100,7 @@ int main(){
                 if (found == NULL) printf("Пустое дерево.\n");
                 break;
             case '7':
-                traversal(root, stdout);
+                traversal(root, stdout, 0);
                 break;
             case '8':
                 free(filename);

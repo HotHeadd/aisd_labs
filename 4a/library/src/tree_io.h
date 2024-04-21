@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 void print_tree(const Node* root, const int);
-void traversal(const Node*, FILE* stream);
+void traversal(const Node*, FILE* stream, int);
 
 void print_found(const Node* found);
 
