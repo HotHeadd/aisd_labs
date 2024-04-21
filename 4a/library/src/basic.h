@@ -1,4 +1,5 @@
 #pragma once
+#include <stdio.h>
 
 int o_n_and_0(double);
 int always_false(double);

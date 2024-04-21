@@ -1,10 +1,11 @@
 #include "../library/src/tree.h"
+#include "../library/src/basic.h"
 #include "../library/src/tree_io.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <sys/stat.h>
-#include <sys/types.h>
+#include <readline/readline.h>
 
 char rchar(){
     char c = (char)rand()%256;
@@ -39,7 +40,8 @@ double timer(int func, int elems){
     char* key;
     unsigned info;
     int res;
-    for (int i=0; i<10;i++){
+    int repeats = 20;
+    for (int i=0; i<repeats;i++){
         get_tree(&root, elems);
         if (func == 0){
             for (int j=0; j<100;j++){
@@ -95,10 +97,12 @@ double timer(int func, int elems){
         free_tree(root);
         root = NULL;
     }
-    return time_sum / 10 / CLOCKS_PER_SEC; 
+    return time_sum / repeats / CLOCKS_PER_SEC; 
 }
 
 int main(){
+    // printf("Transfer res to python diagram folder? (y/n) ");
+    // char mode = better_getchar();
     srand(time(NULL));
     int elems;
     double time_sum;
@@ -113,8 +117,9 @@ int main(){
         FILE* input = fopen(filename, "w");
         fclose(input);
         for (int i=1; i<=20; i++){
-            elems = i*10000;
-            if (func == 3) elems /= 10;
+            printf("Func %d gdata %d\n", func, i);
+            elems = i*100000;
+            if (func == 3) elems /= 100;
             time_sum = timer(func, elems);
             FILE* input = fopen(filename, "a");
             fprintf(input, "%d %.4lf\n", elems, time_sum*1000);
@@ -123,4 +128,7 @@ int main(){
         if (func == 3) remove("filler.txt");
         printf("Done func %d\n", func);
     }
+    // if (mode == 'y'){
+    //     system("cp -r testres/* ~/working/graphics/testres/");
+    // }
 }
