@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <graphviz/gvc.h>
 #include "tree.h"
 #include "tree_io.h"
@@ -112,25 +113,58 @@ int tree_from_txt(Node** root, const char* filename){
     return GOOD;
 }
 
-void fill_tree(Agraph_t* tree, Node* root){
+char* transform(Node* root){
+    char* key = root->key;
+    char* infostr = calloc(1, sizeof(char));
+    info_t* info = root->info;
+    while (info != NULL){
+        if (info != root->info){
+            infostr = realloc(infostr, (strlen(infostr) + 3)*sizeof(char));
+            strcat(infostr, ", ");
+        }
+        int length = snprintf(NULL, 0, "%u", info->value);
+        char* buffer = calloc(length+1, sizeof(char));
+        snprintf(buffer, length + 1, "%u", info->value);
+        infostr = realloc(infostr, (strlen(infostr) + strlen(buffer) + 1)*sizeof(char));
+        strcat(infostr, buffer);
+        free(buffer);
+        info = info->next;
+    }
+    char* result = calloc(strlen(key)+strlen(infostr)+6, sizeof(char));
+    strcat(result, "\"");
+    strcat(result, key);
+    strcat(result, "\"\n[");
+    strcat(result, infostr);
+    strcat(result, "]");
+    free(infostr);
+    return result;
+}
+
+void fill_agraph(Agraph_t* tree, Node* root){
     Agnode_t *first, *second;
     Agedge_t *edge;
-    first = agnode(tree, root->key, 1);
+    char* keyandinfo = transform(root);
+    first = agnode(tree, keyandinfo, 1);
+    free(keyandinfo);
     if (root->left != NULL){
-        second = agnode(tree, root->left->key, 1);
+        keyandinfo = transform(root->left);
+        second = agnode(tree, keyandinfo, 1);
+        free(keyandinfo);
         edge = agedge(tree, first, second, 0, 1);
-        fill_tree(tree, root->left);
+        fill_agraph(tree, root->left);
     }
     if (root->right != NULL){
-        second = agnode(tree, root->right->key, 1);
+        keyandinfo = transform(root->right);
+        second = agnode(tree, keyandinfo, 1);
+        free(keyandinfo);
         edge = agedge(tree, first, second, 0, 1);
-        fill_tree(tree, root->right);
+        fill_agraph(tree, root->right);
     }
 }
 
 void print_gv(Node* root){
     Agraph_t *tree = agopen("tree", Agdirected, 0);
-    fill_tree(tree, root);
+    fill_agraph(tree, root);
     // Just write the graph without layout
     FILE* filler = fopen("filler.gv", "w");
     agwrite(tree, filler);
