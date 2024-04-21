@@ -163,6 +163,7 @@ void fill_agraph(Agraph_t* tree, Node* root){
 }
 
 void print_gv(Node* root){
+    if (root == NULL) return;
     Agraph_t *tree = agopen("tree", Agdirected, 0);
     fill_agraph(tree, root);
     // Just write the graph without layout
@@ -171,7 +172,7 @@ void print_gv(Node* root){
     agclose(tree);
     fclose(filler);
     system("dot -Tpng filler.gv -o image.png");
-    system("eog image.png "); // просмотр изображения
+    system("nomacs image.png -m frameless 1>/dev/null"); // просмотр изображения
     remove("filler.gv");
     remove("image.png");
     return;
