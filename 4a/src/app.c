@@ -5,9 +5,9 @@
 #include "../library/src/tree.h"
 #include "../library/src/tree_io.h"
 
-int eXXit(int mistake, Tree* root, char* filename){
+int eXXit(int mistake, Tree* tree, char* filename){
     printf("Выхожу...\n");
-    free_tree(tree);
+    free_tree(tree, 1);
     free(filename);
     return mistake;
 }
@@ -50,13 +50,13 @@ int main(){
     unsigned info;
     int res = 0;
     char* filename = NULL;
-    Tree* tree = NULL;
+    Tree* tree = get_tree();
     Node* found;
     menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
-                print_tree(tree, 0);
+                print_tree(tree);
                 break;
             case '2':
                 print_gv(tree);
@@ -100,7 +100,7 @@ int main(){
                 if (found == NULL) printf("Пустое дерево.\n");
                 break;
             case '7':
-                traversal(tree, stdout, 0);
+                traversal(tree, stdout, 1);
                 break;
             case '8':
                 free(filename);

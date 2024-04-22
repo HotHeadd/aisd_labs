@@ -4,6 +4,11 @@
 #include <math.h>
 #include <stdio.h>
 
+Tree* get_tree(){
+    Tree* tree = calloc(1, sizeof(tree));
+    return tree;
+}
+
 void free_elem(Node* root, int delroot){
     free(root->key);
     info_t* prev = root->info;
@@ -17,14 +22,16 @@ void free_elem(Node* root, int delroot){
 
 void free_root(Node* root){
     if (root == NULL) return;
-    if (root->left != NULL) free_tree(root->left);
-    if (root->right != NULL) free_tree(root->right);
+    if (root->left != NULL) free_root(root->left);
+    if (root->right != NULL) free_root(root->right);
     free_elem(root, 1);
 }
 
-void free_tree(Tree* tree){
+void free_tree(Tree* tree, int mode){
     Node* root = tree->root;
     free_root(root);
+    if (mode == 1) free(tree);
+    else tree->root = NULL;
 }
 
 void addinfo(Node* root, unsigned info){
@@ -37,55 +44,65 @@ void addinfo(Node* root, unsigned info){
     elem->next = neww;
 }
 
-int insert(Node** root, char* key, unsigned info){
-    if (*root == NULL){
-        *root = calloc(1, sizeof(Node));
-        (*root)->key = key;
-        (*root)->info = calloc(1, sizeof(info_t));
-        (*root)->info->value = info;
-        return ROOT_CREATED;
-    }
-    int compare = strcmp(key, (*root)->key);
+int insert_rec(Node* root, char* key, unsigned info){
+    int compare = strcmp(key, root->key);
     if (compare == 0){
-        addinfo(*root, info);
+        addinfo(root, info);
         return KEY_EXIST;
     }
     if (compare < 0){
-        if ((*root)->left == NULL){
+        if (root->left == NULL){
             Node* child = calloc(1, sizeof(Node));
             child->key = key;
             child->info = calloc(1, sizeof(info_t));
             child->info->value = info;
-            child->parent = *root;
-            (*root)->left = child;
+            child->parent = root;
+            root->left = child;
             return GOOD;
         }
-        return insert(&((*root)->left), key, info);
+        return insert_rec(root->left, key, info);
     }
     if (compare > 0){
-        if ((*root)->right == NULL){
+        if (root->right == NULL){
             Node* child = calloc(1, sizeof(Node));
             child->key = key;
             child->info = calloc(1, sizeof(info_t));
             child->info->value = info;
-            child->parent = *root;
-            (*root)->right = child;
+            child->parent = root;
+            root->right = child;
             return GOOD;
         }
-        return insert(&((*root)->right), key, info);
+        return insert_rec(root->right, key, info);
     }
 }
 
-Node* find(Node* root, const char* key){
+int insert(Tree* tree, char* key, unsigned info){
+    if (tree->root == NULL){
+        tree->root = calloc(1, sizeof(Node));
+        tree->root->key = key;
+        tree->root->info = calloc(1, sizeof(info_t));
+        tree->root->info->value = info;
+        return ROOT_CREATED;
+    }
+    return insert_rec(tree->root, key, info);
+}
+
+Node* find_rec(Node* root, const char* key){
     if (root == NULL) return NULL;
     int compare = strcmp(key, root->key);
     if (compare == 0) return root;
-    if (compare < 0) return find(root->left, key);
-    return find(root->right, key);
+    if (compare < 0) return find_rec(root->left, key);
+    return find_rec(root->right, key);
 }
 
-int delete(Node** root, char* key){
-    Node* elem = find(*root, key);
+Node* find(Tree* tree, const char* key){
+    Node* root = tree->root;
+    return find_rec(root, key);
+}
+
+int delete(Tree* tree, char* key){
+    Node* root = tree->root;
+    Node* elem = find(tree, key);
     if (elem == NULL) return ELEM_NOT_FOUND;
     if (elem->info->next != NULL){
         info_t* data = elem->info;
@@ -115,7 +132,7 @@ int delete(Node** root, char* key){
         return GOOD;
     }
     if (parent == NULL)
-        *root = child;
+        tree->root = child;
     else{
         if (parent->left == elem)
             parent->left = child;
@@ -144,7 +161,8 @@ int mycomp(char* first, char* second){
     else return 0;
 }
 
-Node* special_find(Node* root, char* key){
+Node* special_find(Tree* tree, char* key){
+    Node* root = tree->root;
     if (root == NULL) return NULL;
     Node* lelem = root, *relem = root;
     while (relem->right != NULL)

@@ -21,14 +21,14 @@ char* get_key(){
     return key;
 }
 
-void get_tree(Node** root, int elems){
+void fill_tree(Tree* tree, int elems){
     char* key;
     unsigned info;
     int res;
     for (int j = 0; j<elems; j++){
         key = get_key();
         info = (unsigned)rand();
-        res = insert(root, key, info);
+        res = insert(tree, key, info);
         if (res == KEY_EXIST) free(key);
     }
 }
@@ -36,19 +36,19 @@ void get_tree(Node** root, int elems){
 double timer(int func, int elems){
     double time_sum = 0;
     clock_t start, end;
-    Node* root=NULL;
+    Tree* tree = get_tree();
     char* key;
     unsigned info;
     int res;
     int repeats = 20;
     for (int i=0; i<repeats;i++){
-        get_tree(&root, elems);
+        fill_tree(tree, elems);
         if (func == 0){
             for (int j=0; j<100;j++){
                 key = get_key();
                 info = (unsigned)rand();
                 start = clock();
-                res = insert(&root, key, info);
+                res = insert(tree, key, info);
                 end = clock();
                 if (res == KEY_EXIST) free(key);
                 time_sum += (double) (end - start);
@@ -58,7 +58,7 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 key = get_key();
                 start = clock();
-                find(root, key);
+                find(tree, key);
                 end = clock();
                 free(key);
                 time_sum += (double) (end - start);
@@ -68,7 +68,7 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 key = get_key();
                 start = clock();
-                delete(&root, key);
+                delete(tree, key);
                 end = clock();
                 free(key);
                 time_sum += (double) (end - start);
@@ -78,7 +78,7 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 FILE* filler = fopen("filler.txt", "w");
                 start = clock();
-                traversal(root, filler, 0);
+                traversal(tree, filler, 0);
                 end = clock();
                 fclose(filler);
                 time_sum += (double) (end - start);
@@ -88,15 +88,15 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 key = get_key();
                 start = clock();
-                special_find(root, key);
+                special_find(tree, key);
                 end = clock();
                 free(key);
                 time_sum += (double) (end - start);
             }
         }
-        free_tree(root);
-        root = NULL;
+        free_tree(tree, 0);
     }
+    free_tree(tree, 1);
     return time_sum / repeats / CLOCKS_PER_SEC; 
 }
 
@@ -107,6 +107,7 @@ int main(){
     int elems;
     double time_sum;
     char* filename;
+    int mul = 1000;
     mkdir("./testres", 0700);
     for (int func=0; func<5; func++){
         if (func == 0) filename = "testres/insert.txt";
@@ -118,7 +119,7 @@ int main(){
         fclose(input);
         for (int i=1; i<=20; i++){
             printf("Func %d gdata %d\n", func, i);
-            elems = i*100000;
+            elems = i*i*mul;
             if (func == 3) elems /= 100;
             time_sum = timer(func, elems);
             FILE* input = fopen(filename, "a");

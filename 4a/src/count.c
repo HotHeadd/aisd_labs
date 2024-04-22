@@ -6,9 +6,9 @@
 #include <readline/readline.h>
 #include <ctype.h>
 
-int eXXit(int mistake, Node* root, char* filename){
+int eXXit(int mistake, Tree* tree, char* filename){
     printf("Выхожу...\n");
-    free_tree(root);
+    free_tree(tree, 1);
     free(filename);
     return mistake;
 }
@@ -26,13 +26,13 @@ unsigned get_info(Node* elem){
 }
 
 int main(){
-    Node* root = NULL;
+    Tree* tree = get_tree();
     char* filename = readline("Введите имя файла, из которого взять текст: ");
-    if (filename == NULL) return eXXit(GOOD, root, filename);
+    if (filename == NULL) return eXXit(GOOD, tree, filename);
     FILE* input = fopen(filename, "r");
     if (input == NULL){
         printf("Ошибка файла\n");
-        return eXXit(GOOD, root, filename);;
+        return eXXit(GOOD, tree, filename);;
     }
     Node* elem;
     char letter;
@@ -48,12 +48,12 @@ int main(){
         }
         else{
             if(strlen(word) != 0){
-                elem = find(root, word);
+                elem = find(tree, word);
                 if (elem != NULL){
                     info = get_info(elem) + 1;
-                    delete(&root, word);
+                    delete(tree, word);
                 }
-                insert(&root, word, info);
+                insert(tree, word, info);
                 info = 1;
                 word = calloc(1, sizeof(char));
             }
@@ -64,13 +64,13 @@ int main(){
     fclose(input);
     free(filename);
     filename = readline("Введите имя файла, в который вывести результат работы: ");
-    if (filename == NULL) return eXXit(GOOD, root, filename);
+    if (filename == NULL) return eXXit(GOOD, tree, filename);
     FILE* output = fopen(filename, "w");
     if (output == NULL){
         printf("Ошибка файла\n");
-        return eXXit(GOOD, root, filename);;
+        return eXXit(GOOD, tree, filename);;
     }
-    traversal(root, output, 0);
+    traversal(tree, output, 0);
     fclose(output);
-    return eXXit(GOOD, root, filename);
+    return eXXit(GOOD, tree, filename);
 }

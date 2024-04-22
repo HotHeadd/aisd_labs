@@ -3,12 +3,12 @@
 #include "tree.h"
 #include <stdio.h>
 
-void print_tree(const Node* root, const int);
-void traversal(const Node*, FILE* stream, int);
+void print_tree(const Tree* tree);
+void traversal(const Tree*, FILE* stream, int);
 
 void print_found(const Node* found);
 
-void print_gv(Node* root);
+void print_gv(Tree*);
 
-int tree_to_txt(const Node* root, const char* filename);
-int tree_from_txt(Node** root, const char* filename);
+int tree_to_txt(const Tree*, const char* filename);
+int tree_from_txt(Tree*, const char* filename);

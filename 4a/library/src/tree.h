@@ -28,7 +28,9 @@ typedef struct Tree{
     Node* root;
 } Tree;
 
-void free_tree(Node* root);
+Tree* get_tree();
+
+void free_tree(Tree* tree, int);
 
 int insert(Tree* tree, char* key, unsigned info);
 Node* find(Tree* tree, const char* key);
