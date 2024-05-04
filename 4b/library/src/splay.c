@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include "tree.h"
 #include "splay.h"
 
@@ -57,7 +58,46 @@ void zig(Node* elem){
     elem->parent = grand;
 }
 
-int find_closest(Tree*){
-    
-    return 0;
+Node* merge(Node* neww, Node* left, Node* right){
+    set_parent(left, neww);
+    set_parent(right, neww);
+    if (neww == NULL){
+        if (left == NULL)
+            return right;
+        if (right == NULL)
+            return left;
+        int found;
+        Tree* fake = calloc(1, sizeof(Tree));
+        fake->root = right;
+        right = find(fake, left->key, &found);
+        free(fake);
+        right->left = left;
+        left->parent = right;
+        return right;
+    }
+    else{
+        neww->left = left;
+        neww->right = right;
+        return neww;
+    }
+}
+
+Node** split(Tree* tree, char* key){
+    Node** res = calloc(2, sizeof(Node*));
+    Node* root = tree->root;
+    if (root == NULL) return res;
+    int compare = strcmp(key, root->key);
+    if (compare > 0){
+        res[0] = tree->root;
+        res[1] = tree->root->right;
+        root->right = NULL;
+        set_parent(res[1], NULL);
+    }
+    else{
+        res[0] = tree->root->left;
+        res[1] = tree->root;
+        root->left = NULL;
+        set_parent(res[0], NULL);
+    }
+    return res;
 }

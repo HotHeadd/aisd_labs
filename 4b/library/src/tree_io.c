@@ -85,19 +85,27 @@ int tree_to_txt(const Tree* tree, const char* filename){
     Node* root = tree->root;
     if (root == NULL) return NO_TREE;
     stack_tm* stack = get_stack(SIZE);
-    push(stack, root);
-    while (peek(stack) != NULL){
-        pop(stack, &root);
-        info_t* elem = root->info;
-        while (elem != NULL){
-            fprintf(output, "%s\n", root->key);
-            fprintf(output, "%d\n", elem->value);
-            elem = elem->next;
+    Node* last = NULL;
+    while ((peek(stack) != NULL) || (root != NULL)){
+        if (root != NULL){
+            push(stack, root);
+            root = root->left;
         }
-        if (root->right != NULL)
-            push(stack, root->right);
-        if (root->left != NULL)
-            push(stack, root->left);
+        else{
+            Node* pn = peek(stack);
+            if (pn->right != NULL && last != pn->right){
+                root = pn->right;
+            }
+            else{
+                info_t* elem = pn->info;
+                while (elem != NULL){
+                    fprintf(output, "%s\n", pn->key);
+                    fprintf(output, "%d\n", elem->value);
+                    elem = elem->next;
+                }
+                pop(stack, &last);
+            }
+        }
     }
     fclose(output);
     free_stack(stack);

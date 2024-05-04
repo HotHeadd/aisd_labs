@@ -58,49 +58,24 @@ void addinfo(Node* root, unsigned info){
 }
 
 int insert(Tree* tree, char* key, unsigned info){
-    if (tree->root == NULL){
-        tree->root = calloc(1, sizeof(Node));
-        tree->root->key = key;
-        tree->root->info = calloc(1, sizeof(info_t));
-        tree->root->info->value = info;
-        return ROOT_CREATED;
+    int found;
+    Node* elem = find(tree, key, &found);
+    if (found){ 
+        addinfo(tree->root, info);
+        free(key);
+        return GOOD;
     }
-    Node* root = tree->root;
-    while (1){
-        int compare = strcmp(key, root->key);
-        if (compare == 0){
-            addinfo(root, info);
-            return KEY_EXIST;
-        }
-        if (compare < 0){
-            if (root->left == NULL){
-                Node* child = calloc(1, sizeof(Node));
-                child->key = key;
-                child->info = calloc(1, sizeof(info_t));
-                child->info->value = info;
-                child->parent = root;
-                root->left = child;
-                return GOOD;
-            }
-            root = root->left;
-        }
-        if (compare > 0){
-            if (root->right == NULL){
-                Node* child = calloc(1, sizeof(Node));
-                child->key = key;
-                child->info = calloc(1, sizeof(info_t));
-                child->info->value = info;
-                child->parent = root;
-                root->right = child;
-                return GOOD;
-            }
-            root = root->right;
-        }
-    }
+    Node* neww = calloc(1, sizeof(Node));
+    neww->key = key;
+    neww->info = calloc(1, sizeof(info_t)); 
+    neww->info->value = info;
+    Node** res = split(tree, key);
+    tree->root = merge(neww, res[0], res[1]);
+    free(res);
+    return GOOD;
 }
 
 int delete(Tree* tree, char* key){
-    Node* root = tree->root;
     int found;
     Node* elem = find(tree, key, &found);
     if (!found) return ELEM_NOT_FOUND;
@@ -110,37 +85,7 @@ int delete(Tree* tree, char* key){
         free(data);
         return MULTIPLE_DATA;
     }
-    Node* parent = elem->parent;
-    Node* child = elem->right == NULL ? elem->left : elem->right;
-    if (((elem->left != NULL) && (elem->right != NULL))){
-        Node* minimum = elem->right;
-        while (minimum->left != NULL)
-            minimum = minimum->left;
-        free_elem(elem, 0);
-        elem->key = minimum->key;
-        elem->info = minimum->info;
-        if (minimum->parent != elem){
-            minimum->parent->left = minimum->right;
-            if (minimum->right != NULL)
-                minimum->right->parent = minimum->parent;
-        }
-        else
-            elem->right = minimum->right;
-            if (minimum->right != NULL)
-                minimum->right->parent = minimum->parent;
-        free(minimum);
-        return GOOD;
-    }
-    if (parent == NULL)
-        tree->root = child;
-    else{
-        if (parent->left == elem)
-            parent->left = child;
-        if (parent->right == elem)
-            parent->right = child;
-        if (child != NULL)
-            child->parent = parent;
-    }
+    tree->root = merge(NULL, elem->left, elem->right);
     free_elem(elem, 1);
     return GOOD;
 }
