@@ -99,30 +99,11 @@ int insert(Tree* tree, char* key, unsigned info){
     }
 }
 
-Node* find_rec(Node* root, const char* key){
-    if (root == NULL) return NULL;
-    int compare = strcmp(key, root->key);
-    if (compare == 0) return root;
-    if (compare < 0) return find_rec(root->left, key);
-    return find_rec(root->right, key);
-}
-
-Node* find(Tree* tree, const char* key){
-    Node* root = tree->root;
-    if (root == NULL) return NULL;
-    while (root != NULL){
-        int compare = strcmp(key, root->key);
-        if (compare == 0) return root;
-        if (compare > 0) root = root->right;
-        if (compare < 0) root = root->left;
-    }
-    return root;
-}
-
 int delete(Tree* tree, char* key){
     Node* root = tree->root;
-    Node* elem = find(tree, key);
-    if (elem == NULL) return ELEM_NOT_FOUND;
+    int found;
+    Node* elem = find(tree, key, &found);
+    if (!found) return ELEM_NOT_FOUND;
     if (elem->info->next != NULL){
         info_t* data = elem->info;
         elem->info = elem->info->next;
@@ -164,6 +145,32 @@ int delete(Tree* tree, char* key){
     return GOOD;
 }
 
+Node* find(Tree* tree, const char* key, int* found){
+    Node* root = tree->root;
+    if (root == NULL) {
+        *found = 0;
+        return NULL;
+    }
+    while ((root->left != NULL) || (root->right != NULL)){
+        int compare = strcmp(key, root->key);
+        if (compare == 0){
+            *found = 1;
+            splay(tree, root);
+            return tree->root;
+        }
+        if ((compare > 0) && (root->right != NULL))
+            root = root->right;
+        if ((compare < 0) && (root->left != NULL))
+            root = root->left;
+    }
+    if (strcmp(key, root->key) == 0) 
+        *found = 1;
+    else
+        *found = 0;
+    splay(tree, root);
+    return tree->root;
+}
+
 Node* special_find(Tree* tree, char* key){
     Node* root = tree->root;
     if (root == NULL) return NULL;
@@ -175,5 +182,6 @@ Node* special_find(Tree* tree, char* key){
         return root;
     while (root->right != NULL)
         root = root->right;
+    if (root != NULL) splay(tree, root);
     return root;
 }

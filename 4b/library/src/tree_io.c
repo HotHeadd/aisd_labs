@@ -68,12 +68,12 @@ void traversal(const Tree* tree, FILE* stream, int mode){
     while ((peek(stack) != NULL) || (root != NULL)){
         if (root != NULL){
             push(stack, root);
-            root = root->right;
+            root = root->left;
         }
         else{
             pop(stack, &root);
             put_data(root, stdout);
-            root = root->left;
+            root = root->right;
         }
     }
     free_stack(stack);

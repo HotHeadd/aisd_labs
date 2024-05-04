@@ -18,7 +18,7 @@ void menus(){
     printf("(3) Вставить элемент в дерево\n");
     printf("(4) Удалить элемент из дерева\n");
     printf("(5) Поиск в дереве по ключу\n");
-    printf("(6) Специальный поиск (максимально отличается от заданного)\n");
+    printf("(6) Специальный поиск (минимально отличается от заданного)\n");
     printf("(7) Обход дерева (в обратном порядке)\n");
     printf("(8) Записать дерево в текстовый файл\n");
     printf("(9) Получить дерево из текстового файла\n");
@@ -85,10 +85,10 @@ int main(){
             case '5':
                 key = ask_key();
                 if (key == NULL) return eXXit(GOOD, tree, filename);
-                found = find(tree, key);
+                found = find(tree, key, &res);
                 free(key);
-                if (found != NULL) print_found(found);
-                if (found == NULL) printf("Элемент не найден.\n");
+                if (res) print_found(found);
+                else printf("Элемент не найден.\n");
                 break;
             case '6':
                 key = ask_key();
