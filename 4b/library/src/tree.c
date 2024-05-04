@@ -66,8 +66,8 @@ int insert(Tree* tree, char* key, unsigned info){
         return ROOT_CREATED;
     }
     Node* root = tree->root;
-    int compare = strcmp(key, root->key);
     while (1){
+        int compare = strcmp(key, root->key);
         if (compare == 0){
             addinfo(root, info);
             return KEY_EXIST;
@@ -96,7 +96,6 @@ int insert(Tree* tree, char* key, unsigned info){
             }
             root = root->right;
         }
-        compare = strcmp(key, root->key);
     }
 }
 
@@ -110,7 +109,14 @@ Node* find_rec(Node* root, const char* key){
 
 Node* find(Tree* tree, const char* key){
     Node* root = tree->root;
-    return find_rec(root, key);
+    if (root == NULL) return NULL;
+    while (root != NULL){
+        int compare = strcmp(key, root->key);
+        if (compare == 0) return root;
+        if (compare > 0) root = root->right;
+        if (compare < 0) root = root->left;
+    }
+    return root;
 }
 
 int delete(Tree* tree, char* key){
@@ -158,31 +164,16 @@ int delete(Tree* tree, char* key){
     return GOOD;
 }
 
-
-int mycomp(char* first, char* second){
-    int len1 = strlen(first);
-    int len2 = strlen(second);
-    int iter = (int)fmin(len1, len2);
-    for (int i=0; i < iter; i++){
-        if (first[i] != second[i])
-            return first[i] - second[i];
-    }
-    if (len1 > len2)
-        return first[iter];
-    if (len1 < len2)
-        return second[iter];
-    else return 0;
-}
-
 Node* special_find(Tree* tree, char* key){
     Node* root = tree->root;
     if (root == NULL) return NULL;
-    Node* lelem = root, *relem = root;
-    while (relem->right != NULL)
-        relem = relem->right;
-    while (lelem->left != NULL)
-        lelem = lelem->left;
-    if (mycomp(key, lelem->key) > mycomp(relem->key, key))
-        return lelem;
-    return relem;
+    while (strcmp(key, root->key) > 0) 
+        root = root->right;
+    if (root->left != NULL)
+        root = root->left;
+    else
+        return root;
+    while (root->right != NULL)
+        root = root->right;
+    return root;
 }
