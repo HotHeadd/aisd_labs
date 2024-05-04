@@ -2,6 +2,8 @@
 
 #include "tree.h"
 
+#define SIZE 256
+
 typedef struct stack_tm stack_tm;
 
 stack_tm* get_stack(int maxelems);

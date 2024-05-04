@@ -64,7 +64,7 @@ void print_found(const Node* found){
 
 void traversal(const Tree* tree, FILE* stream, int mode){
     Node* root = tree->root;
-    stack_tm* stack = get_stack(256);
+    stack_tm* stack = get_stack(SIZE);
     while ((peek(stack) != NULL) || (root != NULL)){
         if (root != NULL){
             push(stack, root);
@@ -76,6 +76,7 @@ void traversal(const Tree* tree, FILE* stream, int mode){
             root = root->left;
         }
     }
+    free_stack(stack);
 }
 
 int tree_to_txt(const Tree* tree, const char* filename){
@@ -83,7 +84,7 @@ int tree_to_txt(const Tree* tree, const char* filename){
     if (output == NULL) return FILE_ERROR;
     Node* root = tree->root;
     if (root == NULL) return NO_TREE;
-    stack_tm* stack = get_stack(256);
+    stack_tm* stack = get_stack(SIZE);
     push(stack, root);
     while (peek(stack) != NULL){
         pop(stack, &root);
@@ -99,6 +100,7 @@ int tree_to_txt(const Tree* tree, const char* filename){
             push(stack, root->left);
     }
     fclose(output);
+    free_stack(stack);
     return GOOD;
 }
 
@@ -152,40 +154,28 @@ char* transform(Node* root){
 }
 
 void fill_agraph(Agraph_t* tree, Node* root){
+    if (root == NULL) return;
+    stack_tm* stack = get_stack(SIZE);
     Agnode_t *first, *second;
     Agedge_t *edge;
-    char* keyandinfo = transform(root);
-    first = agnode(tree, keyandinfo, 1);
-    free(keyandinfo);
-    if (root->left != NULL){
-        keyandinfo = transform(root->left);
-        second = agnode(tree, keyandinfo, 1);
+    push(stack, root);
+    while (peek(stack) != NULL){
+        pop(stack, &root);
+        char* keyandinfo = transform(root);
+        first = agnode(tree, keyandinfo, 1);
         free(keyandinfo);
-        edge = agedge(tree, first, second, 0, 1);
-        fill_agraph(tree, root->left);
+        if (root->parent != NULL){
+            keyandinfo = transform(root->parent);
+            second = agnode(tree, keyandinfo, 1);
+            free(keyandinfo);
+            edge = agedge(tree, second, first, 0, 1);
+        }
+        if (root->right != NULL)
+            push(stack, root->right);
+        if (root->left != NULL)
+            push(stack, root->left);
     }
-    else {
-        char* nil = calloc(1, sizeof(char));
-        second = agnode(tree, nil, 1);
-        edge = agedge(tree, first, second, 0, 1);
-        // agsafeset(second, "style", "invis", "");
-        // agsafeset(edge, "style", "invis", "");
-    }
-    if (root->right != NULL){
-        keyandinfo = transform(root->right);
-        second = agnode(tree, keyandinfo, 1);
-        free(keyandinfo);
-        edge = agedge(tree, first, second, 0, 1);
-        fill_agraph(tree, root->right);
-    }
-    else {
-        char* nil2 = calloc(2, sizeof(char));
-        nil2[0] = 'a';
-        second = agnode(tree, nil2, 2);
-        edge = agedge(tree, first, second, 0, 1);
-        // agsafeset(second, "style", "invis", "");
-        // agsafeset(edge, "style", "invis", "");
-    }
+    free_stack(stack);
 }
 
 void print_gv(Tree* tree){
