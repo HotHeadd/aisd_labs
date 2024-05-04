@@ -57,38 +57,6 @@ void addinfo(Node* root, unsigned info){
     elem->next = neww;
 }
 
-int insert_rec(Node* root, char* key, unsigned info){
-    int compare = strcmp(key, root->key);
-    if (compare == 0){
-        addinfo(root, info);
-        return KEY_EXIST;
-    }
-    if (compare < 0){
-        if (root->left == NULL){
-            Node* child = calloc(1, sizeof(Node));
-            child->key = key;
-            child->info = calloc(1, sizeof(info_t));
-            child->info->value = info;
-            child->parent = root;
-            root->left = child;
-            return GOOD;
-        }
-        return insert_rec(root->left, key, info);
-    }
-    if (compare > 0){
-        if (root->right == NULL){
-            Node* child = calloc(1, sizeof(Node));
-            child->key = key;
-            child->info = calloc(1, sizeof(info_t));
-            child->info->value = info;
-            child->parent = root;
-            root->right = child;
-            return GOOD;
-        }
-        return insert_rec(root->right, key, info);
-    }
-}
-
 int insert(Tree* tree, char* key, unsigned info){
     if (tree->root == NULL){
         tree->root = calloc(1, sizeof(Node));
@@ -97,7 +65,39 @@ int insert(Tree* tree, char* key, unsigned info){
         tree->root->info->value = info;
         return ROOT_CREATED;
     }
-    return insert_rec(tree->root, key, info);
+    Node* root = tree->root;
+    int compare = strcmp(key, root->key);
+    while (1){
+        if (compare == 0){
+            addinfo(root, info);
+            return KEY_EXIST;
+        }
+        if (compare < 0){
+            if (root->left == NULL){
+                Node* child = calloc(1, sizeof(Node));
+                child->key = key;
+                child->info = calloc(1, sizeof(info_t));
+                child->info->value = info;
+                child->parent = root;
+                root->left = child;
+                return GOOD;
+            }
+            root = root->left;
+        }
+        if (compare > 0){
+            if (root->right == NULL){
+                Node* child = calloc(1, sizeof(Node));
+                child->key = key;
+                child->info = calloc(1, sizeof(info_t));
+                child->info->value = info;
+                child->parent = root;
+                root->right = child;
+                return GOOD;
+            }
+            root = root->right;
+        }
+        compare = strcmp(key, root->key);
+    }
 }
 
 Node* find_rec(Node* root, const char* key){
