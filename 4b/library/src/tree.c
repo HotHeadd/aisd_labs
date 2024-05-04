@@ -1,9 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include "tree.h"
+#include "tree_io.h"
+#include "stack.h"
 #include "splay.h"
 #include <math.h>
-#include <stdio.h>
 
 Tree* get_tree(){
     Tree* tree = calloc(1, sizeof(tree));
@@ -21,16 +22,27 @@ void free_elem(Node* root, int delroot){
     if (delroot) free(root);
 }
 
-void free_root(Node* root){
-    if (root == NULL) return;
-    if (root->left != NULL) free_root(root->left);
-    if (root->right != NULL) free_root(root->right);
-    free_elem(root, 1);
-}
-
 void free_tree(Tree* tree, int mode){
     Node* root = tree->root;
-    free_root(root);
+    stack_tm* stack = get_stack(SIZE);
+    Node* last = NULL;
+    while ((peek(stack) != NULL) || (root != NULL)){
+        if (root != NULL){
+            push(stack, root);
+            root = root->left;
+        }
+        else{
+            Node* pn = peek(stack);
+            if (pn->right != NULL && last != pn->right){
+                root = pn->right;
+            }
+            else{
+                free_elem(pn, 1);
+                pop(stack, &last);
+            }
+        }
+    }
+    free_stack(stack);
     if (mode == 1) free(tree);
     else tree->root = NULL;
 }
