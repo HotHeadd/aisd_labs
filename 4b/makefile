@@ -34,6 +34,12 @@ ENDCOMP =
 LIB_SRC = $(wildcard $(LIB_PREF_SRC)*.c)
 LIB_OBJ = $(patsubst $(LIB_PREF_SRC)%.c, $(LIB_PREF_OBJ)%.o, $(LIB_SRC))
 
+# .PHONY : test
+
+# test: lib
+# 	gcc -c test.c -o test.o -g
+# 	gcc -o ttt test.o -L./library -lmy -g -lm
+
 final : clean $(TARGET) # remove clean to turn off auto remake
 
 app : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)app.o 

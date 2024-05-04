@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <readline/readline.h>
 
 int eXXit(int mistake, Tree* tree, char* filename){
     printf("Выхожу...\n");
@@ -14,7 +13,7 @@ int eXXit(int mistake, Tree* tree, char* filename){
 
 int main(){
     Tree* tree = get_tree();
-    char* filename = readline("Введите имя файла, из которого взять текст: ");
+    char* filename = g_readline("Введите имя файла, из которого взять текст: ");
     if (filename == NULL) return eXXit(GOOD, tree, filename);
     FILE* input = fopen(filename, "r");
     if (input == NULL){
@@ -24,7 +23,7 @@ int main(){
     // task here
     fclose(input);
     free(filename);
-    filename = readline("Введите имя файла, в который вывести результат работы: ");
+    filename = g_readline("Введите имя файла, в который вывести результат работы: ");
     if (filename == NULL) return eXXit(GOOD, tree, filename);
     FILE* output = fopen(filename, "w");
     if (output == NULL){

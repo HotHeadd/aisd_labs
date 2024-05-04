@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <sys/stat.h>
-#include <readline/readline.h>
 
 char rchar(){
     char c = (char)rand()%256;

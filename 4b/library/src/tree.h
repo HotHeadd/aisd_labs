@@ -31,6 +31,7 @@ typedef struct Tree{
 Tree* get_tree();
 
 void free_tree(Tree* tree, int);
+void free_elem(Node* root, int delroot);
 
 int insert(Tree* tree, char* key, unsigned info);
 Node* find(Tree* tree, const char* key);

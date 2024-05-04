@@ -5,6 +5,7 @@
 #include "tree.h"
 #include "tree_io.h"
 #include "basic.h"
+#include "stack.h"
 
 void put_data(const Node* root, FILE* stream){
     fprintf(stream, "{%s}: [", root->key);
@@ -55,51 +56,50 @@ void print_tree(const Tree* tree){
     print_root(root, 0);
 }
 
-void travel_rec(const Node* root, FILE* stream, int mode){
-    if (root == NULL) return;
-    if (root->right != NULL)
-        travel_rec(root->right, stream, mode);
-    if (mode == 1) 
-        put_data(root, stream);
-    if (mode == 0) 
-        put_data_simple(root, stream);
-    if (root->left != NULL)
-        travel_rec(root->left, stream, mode);
-}
-
-void traversal(const Tree* tree, FILE* stream, int mode){
-    Node* root = tree->root;
-    travel_rec(root, stream, mode);
-}
-
 void print_found(const Node* found){
     printf("Найденный элемент: ");
     put_data(found, stdout);
     return;
 }
 
-int txt_out_rec(const Node* root, const char* filename){
-    if (root == NULL) return NO_TREE;
-    FILE* output = fopen(filename, "a");
-    info_t* elem = root->info;
-    elem = root->info;
-    while (elem != NULL){
-        fprintf(output, "%s\n", root->key);
-        fprintf(output, "%d\n", elem->value);
-        elem = elem->next;
+void traversal(const Tree* tree, FILE* stream, int mode){
+    Node* root = tree->root;
+    stack_tm* stack = get_stack(256);
+    while ((peek(stack) != NULL) || (root != NULL)){
+        if (root != NULL){
+            push(stack, root);
+            root = root->right;
+        }
+        else{
+            pop(stack, &root);
+            put_data(root, stdout);
+            root = root->left;
+        }
     }
-    fclose(output);
-    txt_out_rec(root->left, filename);
-    txt_out_rec(root->right, filename);
-    return GOOD;
 }
 
 int tree_to_txt(const Tree* tree, const char* filename){
     FILE* output = fopen(filename, "w");
     if (output == NULL) return FILE_ERROR;
-    fclose(output);
     Node* root = tree->root;
-    return txt_out_rec(root, filename);
+    if (root == NULL) return NO_TREE;
+    stack_tm* stack = get_stack(256);
+    push(stack, root);
+    while (peek(stack) != NULL){
+        pop(stack, &root);
+        info_t* elem = root->info;
+        while (elem != NULL){
+            fprintf(output, "%s\n", root->key);
+            fprintf(output, "%d\n", elem->value);
+            elem = elem->next;
+        }
+        if (root->right != NULL)
+            push(stack, root->right);
+        if (root->left != NULL)
+            push(stack, root->left);
+    }
+    fclose(output);
+    return GOOD;
 }
 
 int tree_from_txt(Tree* tree, const char* filename){
@@ -164,12 +164,27 @@ void fill_agraph(Agraph_t* tree, Node* root){
         edge = agedge(tree, first, second, 0, 1);
         fill_agraph(tree, root->left);
     }
+    else {
+        char* nil = calloc(1, sizeof(char));
+        second = agnode(tree, nil, 1);
+        edge = agedge(tree, first, second, 0, 1);
+        // agsafeset(second, "style", "invis", "");
+        // agsafeset(edge, "style", "invis", "");
+    }
     if (root->right != NULL){
         keyandinfo = transform(root->right);
         second = agnode(tree, keyandinfo, 1);
         free(keyandinfo);
         edge = agedge(tree, first, second, 0, 1);
         fill_agraph(tree, root->right);
+    }
+    else {
+        char* nil2 = calloc(2, sizeof(char));
+        nil2[0] = 'a';
+        second = agnode(tree, nil2, 2);
+        edge = agedge(tree, first, second, 0, 1);
+        // agsafeset(second, "style", "invis", "");
+        // agsafeset(edge, "style", "invis", "");
     }
 }
 
@@ -181,8 +196,6 @@ void print_gv(Tree* tree){
     gvLayout(gvc, tree_gr, "dot");
     FILE* out = fopen("image.svg", "w");
     gvRender(gvc, tree_gr, "svg", out); 
-    // это даёт какую-то тонну утечек памяти всех сортов, и я не знаю как это исправить.
-    // Тестовые примеры с официального сайта дают такие же утечки памяти
     fclose(out);
     system("nomacs image.svg -m frameless"); // просмотр изображения
     remove("image.svg");

@@ -12,3 +12,5 @@ int custom_uns_input(unsigned* poin, int (*fun)(double));
 char better_getchar();
 
 char* file_readline(FILE* file);
+
+char* g_readline(const char* prompt);

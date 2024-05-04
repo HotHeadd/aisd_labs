@@ -95,3 +95,29 @@ char* file_readline(FILE* file){ //достаю из широких штанин
     }
     return str;
 }
+
+char* g_readline(const char* prompt){
+	int s_len, b_len, res=1, no_action = 1;
+	printf("%s", prompt);
+	char *str=(char*)calloc(1, sizeof(char));
+	char *buff=calloc(5, sizeof(char));
+	res = scanf("%4[^\n]", buff);
+	if (res == -1) {free(buff); free(str); return NULL;}
+	while (buff[0] && res!= 0){
+		no_action = 0;
+		if (res == -1) return NULL;
+		if (str) s_len = strlen(str); else s_len=0;
+		if (buff) b_len = strlen(buff); else b_len=0;
+		str = (char*)realloc(str, (s_len+b_len)*sizeof(char)+1);
+		strcat(str, buff);
+		*(str+s_len+b_len) = '\0';
+		res = scanf("%4[^\n]", buff);
+	}
+	if (buff != NULL) free(buff);
+	scanf("%*c");
+	if (no_action){
+		free(str);
+		str = calloc(1, sizeof(char));
+	}
+	return str;
+}

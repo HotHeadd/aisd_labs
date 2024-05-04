@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <readline/readline.h>
 #include <stdlib.h>
 #include "../library/src/basic.h"
 #include "../library/src/tree.h"
@@ -28,7 +27,7 @@ void menus(){
 
 char* ask_key(){
     char* key;
-    key = readline("Введите ключ: ");
+    key = g_readline("Введите ключ: ");
     if (key == NULL) return NULL;
     return key;
 }
@@ -36,7 +35,7 @@ char* ask_key(){
 int ask_elem(char** key, unsigned* info){
     char* keyin;
     int res;
-    *key = readline("Введите ключ: ");
+    *key = g_readline("Введите ключ: ");
     if (*key == NULL) return END_INPUT;
     printf("Введите значение: ");
     res = custom_int_input(info, o_n_and_0);
@@ -104,7 +103,7 @@ int main(){
                 break;
             case '8':
                 free(filename);
-                filename = readline("Введите имя файла, в который нужно поместить дерево: ");
+                filename = g_readline("Введите имя файла, в который нужно поместить дерево: ");
                 if (filename == NULL) return eXXit(GOOD, tree, filename);
                 res = tree_to_txt(tree, filename);
                 if (res == GOOD) printf("Дерево записано\n");
@@ -113,7 +112,7 @@ int main(){
                 break;
             case '9':
                 free(filename);
-                filename = readline("Введите имя файла, из которого нужно взять дерево: ");
+                filename = g_readline("Введите имя файла, из которого нужно взять дерево: ");
                 if (filename == NULL) return eXXit(GOOD, tree, filename);
                 res = tree_from_txt(tree, filename);
                 if (res == GOOD) printf("Дерево считано\n");
