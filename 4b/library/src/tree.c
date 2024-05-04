@@ -160,8 +160,9 @@ Node* find(Tree* tree, const char* key, int* found){
         }
         if ((compare > 0) && (root->right != NULL))
             root = root->right;
-        if ((compare < 0) && (root->left != NULL))
+        else if ((compare < 0) && (root->left != NULL))
             root = root->left;
+            else break;
     }
     if (strcmp(key, root->key) == 0) 
         *found = 1;
@@ -173,15 +174,18 @@ Node* find(Tree* tree, const char* key, int* found){
 
 Node* special_find(Tree* tree, char* key){
     Node* root = tree->root;
-    if (root == NULL) return NULL;
-    while (strcmp(key, root->key) > 0) 
-        root = root->right;
-    if (root->left != NULL)
-        root = root->left;
-    else
-        return root;
-    while (root->right != NULL)
-        root = root->right;
-    if (root != NULL) splay(tree, root);
-    return root;
+    Node* last = NULL;
+    if (root == NULL) return last;
+    while (root != NULL){
+        int compare = strcmp(key, root->key);
+        if (compare >= 0){
+            root = root->right;
+        }
+        else{
+            last = root;
+            root = root->left;
+        }
+    }
+    if (last != NULL) splay(tree, last);
+    return last;
 }
