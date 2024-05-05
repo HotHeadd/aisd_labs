@@ -3,11 +3,13 @@
 #include "../library/src/basic.h"
 #include "../library/src/tree.h"
 #include "../library/src/tree_io.h"
+#include "dop.h"
 
-int eXXit(int mistake, Tree* tree, char* filename){
+int eXXit(int mistake, Tree* tree, char* filename, char* word){
     printf("Выхожу...\n");
     free_tree(tree, 1);
-    free(filename);
+    free(filename); 
+    free(word);
     return mistake;
 }
 
@@ -22,6 +24,7 @@ void menus(){
     printf("(7) Обход дерева (в прямом порядке, вне заданного диапозона)\n");
     printf("(8) Записать дерево в текстовый файл\n");
     printf("(9) Получить дерево из текстового файла\n");
+    printf("(d) Доп. задание (вывод номеров строк для слова в файле)\n");
     printf("--> ");
 }
 
@@ -48,7 +51,7 @@ int main(){
     char* key;
     unsigned info;
     int res = 0;
-    char* filename = NULL;
+    char* filename = NULL, *word = NULL;
     Tree* tree = get_tree();
     Node* found;
     menus();
@@ -62,7 +65,7 @@ int main(){
                 break;
             case '3':
                 ask_elem(&key, &info);
-                if (res == -1) return eXXit(GOOD, tree, filename);
+                if (res == -1) return eXXit(GOOD, tree, filename, word);
                 res = insert(tree, key, info);
                 if (res == GOOD) printf("Элемент вставлен.\n");
                 if (res == KEY_EXIST){
@@ -73,7 +76,7 @@ int main(){
                 break;
             case '4':
                 key = ask_key("Введите ключ: ");
-                if (key == NULL) return eXXit(GOOD, tree, filename);
+                if (key == NULL) return eXXit(GOOD, tree, filename, word);
                 res = delete(tree, key);
                 free(key);
                 if (res == GOOD) printf("Элемент удален.\n");
@@ -84,7 +87,7 @@ int main(){
                 break;
             case '5':
                 key = ask_key("Введите ключ: ");
-                if (key == NULL) return eXXit(GOOD, tree, filename);
+                if (key == NULL) return eXXit(GOOD, tree, filename, word);
                 found = find(tree, key, &res);
                 free(key);
                 if (res) print_found(found);
@@ -92,7 +95,7 @@ int main(){
                 break;
             case '6':
                 key = ask_key("Введите ключ: ");
-                if (key == NULL) return eXXit(GOOD, tree, filename);
+                if (key == NULL) return eXXit(GOOD, tree, filename, word);
                 found = special_find(tree, key);
                 free(key);
                 if (found != NULL) print_found(found);
@@ -108,7 +111,7 @@ int main(){
             case '8':
                 free(filename);
                 filename = g_readline("Введите имя файла, в который нужно поместить дерево: ");
-                if (filename == NULL) return eXXit(GOOD, tree, filename);
+                if (filename == NULL) return eXXit(GOOD, tree, filename, word);
                 res = tree_to_txt(tree, filename);
                 if (res == GOOD) printf("Дерево записано\n");
                 if (res == NO_TREE) printf("Дерева нет нет!\n");
@@ -117,16 +120,42 @@ int main(){
             case '9':
                 free(filename);
                 filename = g_readline("Введите имя файла, из которого нужно взять дерево: ");
-                if (filename == NULL) return eXXit(GOOD, tree, filename);
+                if (filename == NULL) return eXXit(GOOD, tree, filename, word);
                 res = tree_from_txt(tree, filename);
                 if (res == GOOD) printf("Дерево считано\n");
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
                 if (res == FORMAT_ERROR) printf("Ошибка формата данных\n");
+                break;
+            case 'd':
+                word = NULL;
+                filename = g_readline("Введите имя файла (нажмите enter если брать из прошлого): ");
+                if (filename == NULL) return eXXit(GOOD, tree, filename, word);
+                word = g_readline("Введите искомое слово: ");
+                if (word == NULL) return eXXit(GOOD, tree, filename, word);
+                unsigned* vector;
+                int amount = extra(filename, word, &vector, &tree);
+                if (amount == -1){
+                    printf("Ошибка файла\n");
+                }
+                if (amount == -2){
+                    printf("Такого слова нет в файле!\n");
+                }
+                if (amount == -3){
+                    printf("Нет предыдущего файла\n");
+                }
+                if (amount > 0){
+                    print_vec(vector, amount);
+                    free(vector);
+                }
+                free(filename);
+                filename = NULL;
+                free(word);
+                word = NULL;
                 break;
             default:
                 printf("Нет такой опции в меню!\n");
         }
         menus();
     }
-    return eXXit(GOOD, tree, filename);
+    return eXXit(GOOD, tree, filename, word);
 }

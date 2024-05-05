@@ -1,4 +1,4 @@
-TARGET = count
+TARGET = app
 LIBNAME = my
 ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc# -D $(KEYWORD)
 CC = gcc
@@ -42,14 +42,14 @@ LIB_OBJ = $(patsubst $(LIB_PREF_SRC)%.c, $(LIB_PREF_OBJ)%.o, $(LIB_SRC))
 
 final : clean $(TARGET) # remove clean to turn off auto remake
 
-app : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)app.o 
-	$(CC) -o app $(PROJ_OBJ)app.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
+app : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)app.o $(PROJ_OBJ)dop.o
+	$(CC) -o app $(PROJ_OBJ)app.o $(PROJ_OBJ)dop.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
 timer : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)timer.o
 	$(CC) -o timer $(PROJ_OBJ)timer.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
-count : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)count.o
-	$(CC) -o count $(PROJ_OBJ)count.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
+count : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)count.o $(PROJ_OBJ)dop.o
+	$(CC) -o count $(PROJ_OBJ)count.o $(PROJ_OBJ)dop.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
 $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) : $(LIB_PREF_OBJ) $(LIB_OBJ)
 	$(LEFT) $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(LIB_PREF_OBJ)*.o
