@@ -19,15 +19,15 @@ void menus(){
     printf("(4) Удалить элемент из дерева\n");
     printf("(5) Поиск в дереве по ключу\n");
     printf("(6) Специальный поиск (минимально отличается от заданного)\n");
-    printf("(7) Обход дерева (в обратном порядке)\n");
+    printf("(7) Обход дерева (в прямом порядке, вне заданного диапозона)\n");
     printf("(8) Записать дерево в текстовый файл\n");
     printf("(9) Получить дерево из текстового файла\n");
     printf("--> ");
 }
 
-char* ask_key(){
+char* ask_key(char* prompt){
     char* key;
-    key = g_readline("Введите ключ: ");
+    key = g_readline(prompt);
     if (key == NULL) return NULL;
     return key;
 }
@@ -72,7 +72,7 @@ int main(){
                 if (res == ROOT_CREATED) printf("Дерево создано и вставлен элемент.\n");
                 break;
             case '4':
-                key = ask_key();
+                key = ask_key("Введите ключ: ");
                 if (key == NULL) return eXXit(GOOD, tree, filename);
                 res = delete(tree, key);
                 free(key);
@@ -83,7 +83,7 @@ int main(){
                 if (res == ELEM_NOT_FOUND) printf("Элемента нет в дереве.\n");
                 break;
             case '5':
-                key = ask_key();
+                key = ask_key("Введите ключ: ");
                 if (key == NULL) return eXXit(GOOD, tree, filename);
                 found = find(tree, key, &res);
                 free(key);
@@ -91,7 +91,7 @@ int main(){
                 else printf("Элемент не найден.\n");
                 break;
             case '6':
-                key = ask_key();
+                key = ask_key("Введите ключ: ");
                 if (key == NULL) return eXXit(GOOD, tree, filename);
                 found = special_find(tree, key);
                 free(key);
@@ -99,7 +99,11 @@ int main(){
                 if (found == NULL) printf("Пустое дерево.\n");
                 break;
             case '7':
-                traversal(tree, stdout, 1);
+                char* bottom = ask_key("Введите нижнее значение: ");
+                char* top = ask_key("Введите верхнее значение: ");
+                traversal(tree, stdout, bottom, top);
+                free(top);
+                free(bottom);
                 break;
             case '8':
                 free(filename);

@@ -62,8 +62,7 @@ int insert(Tree* tree, char* key, unsigned info){
     Node* elem = find(tree, key, &found);
     if (found){ 
         addinfo(tree->root, info);
-        free(key);
-        return GOOD;
+        return KEY_EXIST;
     }
     Node* neww = calloc(1, sizeof(Node));
     neww->key = key;

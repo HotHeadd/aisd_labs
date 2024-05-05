@@ -1,6 +1,5 @@
 #pragma once
 
-#include <stdio.h>
 #include "tree.h"
 
 void zig(Node*);

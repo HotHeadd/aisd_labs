@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <graphviz/gvc.h>
-#include <time.h>
 #include "tree.h"
 #include "tree_io.h"
 #include "basic.h"
@@ -63,8 +62,21 @@ void print_found(const Node* found){
     return;
 }
 
-void traversal(const Tree* tree, FILE* stream, int mode){
+void swap(char** bottom, char** top){
+    char* buff = *bottom;
+    *bottom = *top;
+    *top = buff;
+}
+
+int check(char* elem, char* bottom, char* top){
+    return ((strcmp(elem, bottom) < 0) || (strcmp(elem, top) > 0));
+}
+
+void traversal(const Tree* tree, FILE* stream, char* bottom, char* top){
     Node* root = tree->root;
+    if (strcmp(bottom, top) > 0) {
+        swap(&bottom, &top);
+    }
     stack_tm* stack = get_stack(SIZE);
     while ((peek(stack) != NULL) || (root != NULL)){
         if (root != NULL){
@@ -73,7 +85,9 @@ void traversal(const Tree* tree, FILE* stream, int mode){
         }
         else{
             pop(stack, &root);
-            put_data(root, stdout);
+            if (check(root->key, bottom, top)) {
+                put_data(root, stdout);
+            }
             root = root->right;
         }
     }
