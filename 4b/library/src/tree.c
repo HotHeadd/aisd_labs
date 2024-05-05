@@ -23,6 +23,7 @@ void free_elem(Node* root, int delroot){
 }
 
 void free_tree(Tree* tree, int mode){
+    if (tree == NULL) return;
     Node* root = tree->root;
     stack_tm* stack = get_stack(SIZE);
     Node* last = NULL;

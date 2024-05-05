@@ -59,51 +59,87 @@ void print_vec(unsigned* vector, int amount){
     printf("]\n");
 }
 
-int main(){
-    Tree* tree = get_tree();
-    char* string, *word = NULL;
-    char* filename = g_readline("Введите имя файла, из которого взять текст: ");
-    if (filename == NULL) return eXXit(GOOD, tree, filename, word);
-    FILE* input = fopen(filename, "r");
-    if (input == NULL){
-        printf("Ошибка файла\n");
-        return eXXit(GOOD, tree, filename, word);;
+int hash(char* word){
+    int hash = 0;
+    for (int i=0; i<strlen(word); i++){
+        hash += 37*((char)word[i]) + word[i]%37;
     }
-    int num = 1;
-    int res;
-    while ((string = file_readline(input)) != NULL){
-        word = strtok(string, SEPS);
-        if (word == NULL){
-            free(string);
-            continue;
+    return hash;
+}
+
+int extra(char* filename, char* looking, unsigned** vector, Tree** ptr){
+    static int prev = -1;
+    static Tree* tree = NULL;
+    if ((strlen(filename) != 0) && (prev != hash(filename))){
+        FILE* input = fopen(filename, "r");
+        if (input == NULL){
+            return -1;
         }
-        char *key = strdup(lower(word));
-        if ((res = insert(tree, key, num)) == KEY_EXIST){
-            free(key);
-        }
-        while ((word = strtok(NULL, SEPS)) != NULL){
-            key = strdup(lower(word));
+        free_tree(tree, 1);
+        tree = get_tree();
+        prev = hash(filename);
+        *ptr = tree;
+        char* string, *word;
+        int num = 1;
+        int res;
+        while ((string = file_readline(input)) != NULL){
+            word = strtok(string, SEPS);
+            if (word == NULL){
+                num++;
+                free(string);
+                continue;
+            }
+            char *key = strdup(lower(word));
             if ((res = insert(tree, key, num)) == KEY_EXIST){
                 free(key);
             }
+            while ((word = strtok(NULL, SEPS)) != NULL){
+                key = strdup(lower(word));
+                if ((res = insert(tree, key, num)) == KEY_EXIST){
+                    free(key);
+                }
+            }
+            num++;
+            free(string);
         }
-        num++;
-        free(string);
+        fclose(input);
     }
-    fclose(input);
-    while ((word = g_readline("Введите искомое слово: ")) != NULL){
-        int found;
-        Node* elem = find(tree, word, &found);
-        if (!found){
-            free(word);
-            printf("Такое слово не встречалось в файле!\n");
-            continue;
-        }
+    if (tree == NULL){
+        return -3;
+    }
+    int found;
+    Node* elem = find(tree, looking, &found);
+    if (!found){
+        return -2;
+    }
+    return form_vector(elem, vector);
+}
+
+int main(){
+    Tree* tree = NULL;
+    char* word = NULL, *filename = NULL;
+    while (1){
+        filename = g_readline("Введите имя файла (нажмите enter если брать из прошлого): ");
+        if (filename == NULL) return eXXit(GOOD, tree, filename, word);
+        word = g_readline("Введите искомое слово: ");
+        if (word == NULL) return eXXit(GOOD, tree, filename, word);
         unsigned* vector;
-        int amount = form_vector(elem, &vector);
-        print_vec(vector, amount);
-        free(vector);
+        int amount = extra(filename, word, &vector, &tree);
+        if (amount == -1){
+            printf("Ошибка файла\n");
+        }
+        if (amount == -2){
+            printf("Такого слова нет в файле!\n");
+        }
+        if (amount == -3){
+            printf("Нет предыдущего файла\n");
+        }
+        if (amount > 0){
+            print_vec(vector, amount);
+            free(vector);
+        }
+        free(filename);
         free(word);
+        word = NULL;
     }
-    return eXXit(GOOD, tree, filename, word);
 }

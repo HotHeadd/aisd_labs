@@ -92,8 +92,7 @@ char* file_readline(FILE* file){ //достаю из широких штанин
     fscanf(file, "%*c");
     if (no_action){
 		free(str);
-		str = calloc(7, sizeof(char));
-		strcat(str, "(null)");
+		str = calloc(1, sizeof(char));
     }
     return str;
 }
