@@ -1,4 +1,4 @@
-TARGET = app
+TARGET = count
 LIBNAME = my
 ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc# -D $(KEYWORD)
 CC = gcc
@@ -8,7 +8,7 @@ CC = gcc
 LIB_LOCATION = ./library
 LIB_PREF_SRC = $(LIB_LOCATION)/src/
 LIB_PREF_OBJ = $(LIB_LOCATION)/obj/
-LINBAME = tree	
+LINBAME = tree
 
 PROJ_SRC = ./src/
 PROJ_OBJ = ./obj/
