@@ -57,7 +57,8 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 key = get_key();
                 start = clock();
-                find(tree, key);
+                int found;
+                find(tree, key, &found);
                 end = clock();
                 free(key);
                 time_sum += (double) (end - start);
@@ -77,7 +78,7 @@ double timer(int func, int elems){
             for (int j=0; j<100;j++){
                 FILE* filler = fopen("filler.txt", "w");
                 start = clock();
-                traversal(tree, filler, 0);
+                traversal(tree, filler, get_key(), get_key());
                 end = clock();
                 fclose(filler);
                 time_sum += (double) (end - start);
@@ -100,14 +101,14 @@ double timer(int func, int elems){
 }
 
 int main(){
-    // printf("Transfer res to python diagram folder? (y/n) ");
-    // char mode = better_getchar();
+    printf("Transfer res to python diagram folder? (y/n) ");
+    char mode = better_getchar();
     srand(time(NULL));
     int elems;
     double time_sum;
     char* filename;
-    int mul = 1000;
-    mkdir("./testres", 0700);
+    int mul = 10000;
+    mkdir("testres", 0700);
     for (int func=0; func<5; func++){
         if (func == 0) filename = "testres/insert.txt";
         if (func == 1) filename = "testres/find.txt";
@@ -117,9 +118,9 @@ int main(){
         FILE* input = fopen(filename, "w");
         fclose(input);
         for (int i=1; i<=20; i++){
-            printf("Func %d gdata %d\n", func, i);
-            elems = i*i*mul;
+            elems = i*mul;
             if (func == 3) elems /= 100;
+            printf("Func %d gdata %d elems %d\n", func, i, elems);
             time_sum = timer(func, elems);
             FILE* input = fopen(filename, "a");
             fprintf(input, "%d %.4lf\n", elems, time_sum*1000);
@@ -128,7 +129,7 @@ int main(){
         if (func == 3) remove("filler.txt");
         printf("Done func %d\n", func);
     }
-    // if (mode == 'y'){
-    //     system("cp -r testres/* ~/working/graphics/testres/");
-    // }
+    if (mode == 'y'){
+        system("cp -r testres/* ~/working/graphics/testres/");
+    }
 }
