@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <graphviz/gvc.h>
+#include <time.h>
 #include "tree.h"
 #include "tree_io.h"
 #include "basic.h"
@@ -135,6 +136,21 @@ int tree_from_txt(Tree* tree, const char* filename){
 }
 
 char* transform(Node* root){
+    static int nils = 0;
+    if (root == NULL){
+        char* ret = calloc(6+(nils/26), sizeof(char));
+        for (int i=0; i<3;i++){
+            ret[i] = nils%26 +'a';
+        }
+        ret[3] = '\n';
+        for (int i=4; i<4+(nils/26)+1;i++){
+            ret[i] = nils%26 +'a';
+            if ((i%5 == 0) && (i != 5))
+                ret[i] = '\n';
+        }
+        nils++;
+        return ret;
+    }
     char* key = root->key;
     char* infostr = calloc(1, sizeof(char));
     info_t* info = root->info;
@@ -161,27 +177,46 @@ char* transform(Node* root){
     return result;
 }
 
+Agnode_t* draw(Agraph_t* tree, Node* elem){
+    char* keyandinfo = transform(elem);
+    Agnode_t* second = agnode(tree, keyandinfo, 1);
+    free(keyandinfo);
+    return second;
+}
+
 void fill_agraph(Agraph_t* tree, Node* root){
     if (root == NULL) return;
     stack_tm* stack = get_stack(SIZE);
     Agnode_t *first, *second;
     Agedge_t *edge;
+    char* keyandinfo;
     push(stack, root);
     while (peek(stack) != NULL){
         pop(stack, &root);
-        char* keyandinfo = transform(root);
-        first = agnode(tree, keyandinfo, 1);
-        free(keyandinfo);
+        first = draw(tree, root);
         if (root->parent != NULL){
-            keyandinfo = transform(root->parent);
-            second = agnode(tree, keyandinfo, 1);
-            free(keyandinfo);
+            second = draw(tree, root->parent);
             edge = agedge(tree, second, first, 0, 1);
         }
-        if (root->right != NULL)
+        if (root->right != NULL){
+            if (root->left == NULL){
+                second = draw(tree, NULL);
+                edge = agedge(tree, first, second, 0, 1);
+                agsafeset(second, "style", "invis", "");
+                agsafeset(edge, "style", "invis", "");
+            }
             push(stack, root->right);
-        if (root->left != NULL)
+        }
+        if (root->left != NULL){
+            if (root->right == NULL){
+                second = draw(tree, root->left);
+                second = draw(tree, NULL);
+                edge = agedge(tree, first, second, 0, 1);
+                agsafeset(second, "style", "invis", "");
+                agsafeset(edge, "style", "invis", "");
+            }
             push(stack, root->left);
+        }
     }
     free_stack(stack);
 }
