@@ -7,6 +7,14 @@
 #include <ctype.h>
 #include "dop.h"
 
+int eXXit(int mistake, Tree* tree, char* filename, char* word){
+    printf("Выхожу...\n");
+    free_tree(tree, 1);
+    free(filename); 
+    free(word);
+    return mistake;
+}
+
 int main(){
     Tree* tree = NULL;
     char* word = NULL, *filename = NULL;
