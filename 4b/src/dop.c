@@ -51,7 +51,7 @@ void print_vec(unsigned* vector, int amount){
     printf("]\n");
 }
 
-int hash(char* word){
+int file_id(char* word){
     int hash = 0;
     for (int i=0; i<strlen(word); i++){
         hash += 37*((char)word[i]) + word[i]%37;
@@ -62,14 +62,14 @@ int hash(char* word){
 int extra(char* filename, char* looking, unsigned** vector, Tree** ptr){
     static int prev = -1;
     static Tree* tree = NULL;
-    if ((strlen(filename) != 0) && (prev != hash(filename))){
+    if ((strlen(filename) != 0) && (prev != file_id(filename))){
         FILE* input = fopen(filename, "r");
         if (input == NULL){
             return -1;
         }
         free_tree(*ptr, 1);
         tree = get_tree();
-        prev = hash(filename);
+        prev = file_id(filename);
         *ptr = tree;
         char* string, *word;
         int num = 1;
