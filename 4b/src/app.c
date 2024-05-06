@@ -64,7 +64,7 @@ int main(){
                 print_gv(tree);
                 break;
             case '3':
-                ask_elem(&key, &info);
+                res = ask_elem(&key, &info);
                 if (res == -1) return eXXit(GOOD, tree, filename, word);
                 res = insert(tree, key, info);
                 if (res == GOOD) printf("Элемент вставлен.\n");
