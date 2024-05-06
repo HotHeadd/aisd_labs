@@ -78,7 +78,15 @@ char* file_readline(FILE* file){ //достаю из широких штанин
     if (res == -1) {free(buff); free(str); return NULL;}
     while (buff[0] && res!= 0){
 		no_action = 0;
-		if (res == -1) {free(buff); free(str); return NULL;}
+		if (res == -1) {
+			if (strlen(str) > 0){
+				free(buff);
+				return str;
+			}
+			free(buff); 
+			free(str); 
+			return NULL;
+		}
 		if (str) s_len = strlen(str); else s_len = 0;
 		if (buff) b_len = strlen(buff); else b_len = 0;
 		str = (char*)realloc(str, (s_len+b_len)*sizeof(char)+1);
