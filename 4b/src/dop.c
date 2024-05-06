@@ -6,7 +6,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define SEPS " ,;.:!?)(_=+-@#$%^&*<>/|\\{}[]\"\t"
+#define SEPS " ,;.:!?)(_=+-@#$^&*<>/|\\{}[]\"\t\r"
 
 char* lower(char* word){
     for (int i=0; i<strlen(word); i++){
@@ -51,30 +51,40 @@ void print_vec(unsigned* vector, int amount){
     printf("]\n");
 }
 
-int file_id(char* word){
+int file_hash(char* filename){
     int hash = 0;
-    for (int i=0; i<strlen(word); i++){
-        hash += 37*((char)word[i]) + word[i]%37;
+    FILE* input = fopen(filename, "r");
+    char* string;
+    if (input == NULL){
+        return -100;
     }
+    while ((string = file_readline(input)) != NULL){
+        for (int i=0; i<strlen(string); i++){
+            hash += string[i]*37 + string[i]%37;
+        }
+        free(string);
+    }
+    fclose(input);
     return hash;
 }
 
 int extra(char* filename, char* looking, unsigned** vector, Tree** ptr){
     static int prev = -1;
     static Tree* tree = NULL;
-    if ((strlen(filename) != 0) && (prev != file_id(filename))){
+    if ((strlen(filename) != 0) && (prev != file_hash(filename))){
         FILE* input = fopen(filename, "r");
         if (input == NULL){
             return -1;
         }
         free_tree(*ptr, 1);
         tree = get_tree();
-        prev = file_id(filename);
+        prev = file_hash(filename);
         *ptr = tree;
         char* string, *word;
         int num = 1;
         int res;
         while ((string = file_readline(input)) != NULL){
+            // if (num == 46) printf("%d %s\n", num, string);
             word = strtok(string, SEPS);
             if (word == NULL){
                 num++;
@@ -82,11 +92,13 @@ int extra(char* filename, char* looking, unsigned** vector, Tree** ptr){
                 continue;
             }
             char *key = strdup(lower(word));
+            // if (num == 46) printf("%d %s %s\n", num, word, key);
             if ((res = insert(tree, key, num)) == KEY_EXIST){
                 free(key);
             }
             while ((word = strtok(NULL, SEPS)) != NULL){
                 key = strdup(lower(word));
+                if (num == 46) printf("%s##\n", word);
                 if ((res = insert(tree, key, num)) == KEY_EXIST){
                     free(key);
                 }

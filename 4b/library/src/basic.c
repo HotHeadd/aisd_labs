@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 #include "basic.h"
 
 int always_false(double x){
@@ -70,7 +71,7 @@ char better_getchar(){
 	return buk;
 }
 
-char* file_readline(FILE* file){ //достаю из широких штанин функцию из 4 лабы
+char* file_readline(FILE* file){
     int s_len, b_len, res = 1, no_action = 1;
     char *str = (char*)calloc(1, sizeof(char));
     char *buff = calloc(5, sizeof(char));
