@@ -25,25 +25,24 @@ void free_elem(Node* root, int delroot){
 void free_tree(Tree* tree, int mode){
     if (tree == NULL) return;
     Node* root = tree->root;
-    stack_tm* stack = get_stack(SIZE);
     Node* last = NULL;
-    while ((peek(stack) != NULL) || (root != NULL)){
-        if (root != NULL){
-            push(stack, root);
+    while (root != NULL){
+        if ((root->right == NULL) && (root->left == NULL)){
+            last = root->parent;
+            if ((last != NULL) && (last->left == root)) last->left = NULL;
+            if ((last != NULL) && (last->right == root)) last->right = NULL;
+            free_elem(root, 1);
+            root = last;
+            continue;
+        }
+        if (root->left != NULL){
             root = root->left;
         }
         else{
-            Node* pn = peek(stack);
-            if (pn->right != NULL && last != pn->right){
-                root = pn->right;
-            }
-            else{
-                free_elem(pn, 1);
-                pop(stack, &last);
-            }
+            root = root->right;
         }
+        
     }
-    free_stack(stack);
     if (mode == 1) free(tree);
     else tree->root = NULL;
 }

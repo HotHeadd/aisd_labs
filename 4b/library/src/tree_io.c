@@ -125,6 +125,8 @@ int tree_from_txt(Tree* tree, const char* filename){
     while ((key = file_readline(input)) != NULL){
         res = fscanf(input, "%u", &info);
         if (res == 0){
+            free(key);
+            fclose(input);
             free_tree(tree, 0);
             return FILE_ERROR;
         }
