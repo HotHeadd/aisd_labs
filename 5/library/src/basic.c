@@ -16,8 +16,9 @@ int o_n_and_0(double x){
 	return x<0;
 }
 
-int custom_double_input(double* poin, int (*fun)(double)){
+int custom_double_input(char* prompt, double* poin, int (*fun)(double)){
 	char tras=0;
+	printf("%s", prompt);
 	int retu = scanf("%lf", poin);
 	scanf("%c", &tras);
 	while ((fun(*poin))||(retu<1)||(tras!='\n')){
@@ -30,8 +31,9 @@ int custom_double_input(double* poin, int (*fun)(double)){
 	return retu;
 }
 
-int custom_int_input(int* poin, int (*fun)(double)){
+int custom_int_input(char* prompt, int* poin, int (*fun)(double)){
 	char tras=0;
+	printf("%s", prompt);
 	int retu = scanf("%d", poin);
 	scanf("%c", &tras);
 	while ((retu<1)||(fun(*poin))||(tras!='\n')){
@@ -43,8 +45,9 @@ int custom_int_input(int* poin, int (*fun)(double)){
 	}
 	return retu;
 }
-int custom_uns_input(unsigned* poin, int (*fun)(double)){
+int custom_uns_input(char* prompt, unsigned* poin, int (*fun)(double)){
 	char tras=0;
+	printf("%s", prompt);
 	int retu = scanf("%u", poin);
 	scanf("%c", &tras);
 	while ((retu<1)||(fun(*poin))||(tras!='\n')){
