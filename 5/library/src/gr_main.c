@@ -19,20 +19,25 @@ Graph* get_graph(int size){
     graph->nodes = calloc(size, sizeof(Node*));
     return graph;
 }
+
+void free_edges(Node* elem){
+    Edge* edge = elem->edges;
+    Edge* prev = edge;
+    while (edge != NULL){
+        free(edge->dest);
+        edge = edge->next;
+        free(prev);
+        prev = edge;
+    }
+}
+
 void free_graph(Graph* graph){
     if (graph == NULL) return;
     for (int i=0; i<graph->msize; i++){
         Node* elem = graph->nodes[i];
         if (elem == NULL) continue;
         free(elem->name);
-        Edge* edge = elem->edges;
-        Edge* prev = edge;
-        while (edge != NULL){
-            free(edge->dest);
-            edge = edge->next;
-            free(prev);
-            prev = edge;
-        }
+        free_edges(elem);
         free(elem);
     }
     free(graph->nodes);
@@ -85,8 +90,12 @@ int gr_add_node(Graph* graph, char* human){
             out =  COLLISION;
         }
     }
-    graph->nodes[index] = calloc(1, sizeof(Node));
+    if (graph->nodes[index] == NULL)
+        graph->nodes[index] = calloc(1, sizeof(Node));
+    if (graph->nodes[index] != NULL)
+        free(graph->nodes[index]->name);
     graph->nodes[index]->name = strdup(human);
+    graph->nodes[index]->edges = NULL; 
     graph->nodes[index]->state = 1; 
     graph->csize++;
     if (graph->csize >= ((double)(graph->msize))*(0.75)){
@@ -114,6 +123,7 @@ int gr_add_edge(Graph* graph, char* human, char* fam, int rel){
     Node* elem = find(graph, human);
     Node* check = find(graph, fam);
     if ((elem == NULL) || (check == NULL)) return ELEM_NOT_FOUND;
+    gr_del_edge(graph, human, fam);
     Edge* neww = calloc(1, sizeof(Edge));
     neww->rel = rel;
     neww->dest = strdup(fam);
@@ -123,7 +133,18 @@ int gr_add_edge(Graph* graph, char* human, char* fam, int rel){
 }
 
 int gr_del_node(Graph *graph, char* human){
-    return 0;
+    Node* elem = find(graph, human);
+    if (elem == NULL) return ELEM_NOT_FOUND;
+    elem->state = -1;
+    free_edges(elem);
+    elem->edges = NULL;
+    for (int i=0; i<graph->msize;i++){
+        Node* iter = graph->nodes[i];
+        if ((iter == NULL) || (iter->state == -1)) continue;
+        gr_del_edge(graph, iter->name, human);
+    }
+    graph->csize--;
+    return GOOD;
 }
 
 int gr_del_edge(Graph *graph, char* human, char* fam){
@@ -151,9 +172,36 @@ int gr_del_edge(Graph *graph, char* human, char* fam){
 }
 
 int gr_change_node(Graph* graph, char* human, char* neww){
-    return 0;
+    Node* elem = find(graph, human);
+    if (elem == NULL) return ELEM_NOT_FOUND;
+    int index = hash(graph->msize, elem->name);
+    while (strcmp(graph->nodes[index]->name, human) != 0){
+        index = (index + 1)%graph->msize;
+    }
+    graph->nodes[index] = NULL;
+    free(elem->name);
+    elem->name = neww;
+    index = hash(graph->msize, neww);
+    while ((graph->nodes[index] != NULL) || (graph->nodes[index]->state != -1)){
+        index = (index + 1)%graph->msize;
+    }
+    graph->nodes[index] = elem;
+    return GOOD;
 }
 
-int gr_change_edge(Graph* graph, char* human, char* neww, int rel){
-    return 0;
+int gr_change_edge(Graph* graph, char* human, char* fam, int new){
+    Node* elem = find(graph, human);
+    if (elem == NULL) return ELEM_NOT_FOUND;
+    Edge* edge = elem->edges;
+    Edge* prev = NULL;
+    if (edge == NULL) return ELEM_NOT_FOUND;
+     while (edge != NULL){
+        if (strcmp(edge->dest, fam) == 0){
+            edge->rel = new;
+            return GOOD;
+        }
+        prev = edge;
+        edge = edge->next;
+    }
+    return ELEM_NOT_FOUND;
 }

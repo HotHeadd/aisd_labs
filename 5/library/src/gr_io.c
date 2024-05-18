@@ -17,7 +17,7 @@ void gr_out_list(const Graph* graph){
     printf("Здравствуйте, ваш граф:\n");
     for (int i=0; i<graph->msize;i++){
         Node* elem = graph->nodes[i];
-        if (elem != NULL){
+        if ((elem != NULL) && (elem->state == 1)){
             printf("\"%s\"", elem->name);
             Edge* edge = elem->edges;
             while (edge != NULL){
@@ -104,8 +104,6 @@ int gr_txt_in(Graph** graph, const char* filename){
             free(fam);
         }
         free(name);
-        // gr_out_list(*graph);
-        // sleep(1);
     }
     free(name);
     fclose(input);

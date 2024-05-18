@@ -86,7 +86,8 @@ int main(){
                 if (human == NULL) 
                     return exxit(graph, human, fam, filename);
                 res = gr_del_node(graph, human);
-                //res dev
+                if (res == GOOD) printf("Человек ликвидирован\n"); 
+                if (res == ELEM_NOT_FOUND) printf("Человека нет в дереве\n");
                 break;
             case '6':
                 free(human);
