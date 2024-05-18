@@ -113,7 +113,7 @@ void fill_agraph(Agraph_t* agv, const Graph* graph){
         Node* elem = graph->nodes[i];
         if ((elem != NULL) && (elem->state != -1))
             if (strlen(elem->name) == 0){
-                agnode(agv, EMPTY, 1);
+                agnode(agv, "", 1);
             }
             else agnode(agv, elem->name, 1);
     }
@@ -125,10 +125,12 @@ void fill_agraph(Agraph_t* agv, const Graph* graph){
             while (edge != NULL){
                 first = agnode(agv, elem->name, 1);
                 if (strlen(edge->dest) == 0)
-                    second = agnode(agv, EMPTY, 1);
+                    second = agnode(agv, "", 1);
                 else second = agnode(agv, edge->dest, 1);
                 Dedge = agedge(agv, first, second, 0, 1);
-                agsafeset(Dedge, "label", "  a to b", "");
+                char lab[4] = {'\0'};
+                sprintf(lab, "%d", edge->rel);
+                agsafeset(Dedge, "label", lab, "");
                 edge = edge->next;
             }
         }
