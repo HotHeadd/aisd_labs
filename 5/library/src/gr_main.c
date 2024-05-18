@@ -9,7 +9,7 @@ int hash(int size, char* string){
     for (int i=0; i<strlen(string); i++){
         hash += string[i]*37 + string[i]%37;
     }
-    return hash%(size);
+    return hash%size;
 }
 
 Graph* get_graph(int size){
@@ -55,12 +55,16 @@ unsigned simple(unsigned size){
 
 void extend(Graph* graph){
     int newsize = simple(graph->msize*2);
-    printf("%d\n", newsize);
     Node** newnodes = calloc(newsize, sizeof(Node*));
     for (int i=0; i<graph->msize;i++){
         Node* elem = graph->nodes[i];
         if (elem == NULL) continue;
         int index = hash(newsize, elem->name);
+        Node* nelem = newnodes[index];
+        while (nelem != NULL){
+            index = (index + 1)%newsize;
+            nelem = newnodes[index];
+        }
         newnodes[index] = elem;
     }
     free(graph->nodes);
@@ -71,12 +75,14 @@ void extend(Graph* graph){
 int gr_add_node(Graph* graph, char* human){
     int index = hash(graph->msize, human);
     Node* elem = graph->nodes[index];
+    int out = GOOD;
     if (elem != NULL){
         while ((elem != NULL) && (elem->state == 1)){
             if (strcmp(elem->name, human) == 0)
                 return ELEM_EXIST;
             index = (index + 1)%graph->msize;
             elem = graph->nodes[index];
+            out =  COLLISION;
         }
     }
     graph->nodes[index] = calloc(1, sizeof(Node));
@@ -86,7 +92,7 @@ int gr_add_node(Graph* graph, char* human){
     if (graph->csize >= ((double)(graph->msize))*(0.75)){
         extend(graph);
     }
-    return GOOD;
+    return out;
 }
 
 Node* find(Graph* graph, char* human){
@@ -120,8 +126,28 @@ int gr_del_node(Graph *graph, char* human){
     return 0;
 }
 
-int gr_del_edge(Graph *graph, char* humanm, char* fam){
-    return 0;
+int gr_del_edge(Graph *graph, char* human, char* fam){
+    Node* elem = find(graph, human);
+    if (elem == NULL) return ELEM_NOT_FOUND;
+    Edge* edge = elem->edges;
+    Edge* prev = NULL;
+    if (edge == NULL) return ELEM_NOT_FOUND;
+    while (edge != NULL){
+        if (strcmp(edge->dest, fam) == 0){
+            if (prev == NULL){
+                elem->edges = edge->next;
+            }
+            else{
+                prev->next = edge->next;
+            }
+            free(edge->dest);
+            free(edge);
+            return GOOD;
+        }
+        prev = edge;
+        edge = edge->next;
+    }
+    return ELEM_NOT_FOUND;
 }
 
 int gr_change_node(Graph* graph, char* human, char* neww){

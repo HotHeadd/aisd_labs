@@ -98,7 +98,8 @@ int main(){
                 if (fam == NULL) 
                     return exxit(graph, human, fam, filename);
                 res = gr_del_edge(graph, human, fam);
-                //res dev
+                if (res == GOOD) printf("Связь удалена\n"); 
+                if (res == ELEM_NOT_FOUND) printf("Одного из людей нет в дереве\n"); 
                 break;
             case '7':
                 free(human);

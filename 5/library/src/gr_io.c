@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <graphviz/gvc.h>
+#include <unistd.h>
 
 #define EMPTY "&-&-&"
 
@@ -34,7 +35,10 @@ void output_edges(FILE* output, Node* elem){
     int amount = 1;
     Edge* edge=elem->edges;
     while ((edge = edge->next) != NULL) amount++;
-    fprintf(output, "%s\n", elem->name);
+    if (strlen(elem->name) == 0){
+        fprintf(output, "%s\n", EMPTY);
+    }
+    else fprintf(output, "%s\n", elem->name);
     fprintf(output, "%d\n", amount);
     edge = elem->edges;
     while (edge != NULL){
@@ -100,6 +104,8 @@ int gr_txt_in(Graph** graph, const char* filename){
             free(fam);
         }
         free(name);
+        // gr_out_list(*graph);
+        // sleep(1);
     }
     free(name);
     fclose(input);
@@ -148,7 +154,7 @@ void gr_out_gv(const Graph* graph){
     fclose(out);
     system("nomacs image.svg -m frameless"); // просмотр изображения
     remove("image.svg");
-    gvFreeLayout(gvc, agr);
+    // gvFreeLayout(gvc, agr);
     agclose(agr);
-    gvFreeContext(gvc);
+    // gvFreeContext(gvc);
 }
