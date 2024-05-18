@@ -3,6 +3,7 @@
 #include "../library/src/basic.h"
 #include "../library/src/gr_main.h"
 #include "../library/src/gr_algo.h"
+#include "../library/src/gr_io.h"
 
 int exxit(graph_t* graph, char* human, char* fam, char* filename){
     printf("Выхожу...\n");
