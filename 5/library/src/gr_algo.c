@@ -1,14 +1,14 @@
 #include "gr_algo.h"
 #include <stdlib.h>
 
-Node** dijkstra(graph_t* graph, char* first, char* second){
+Node** dijkstra(Graph* graph, char* first, char* second){
     return NULL;
 }
 
-Node** findwide(graph_t* graph, char* human, int handshakes){
+Node** findwide(Graph* graph, char* human, int handshakes){
     return NULL;
 }
 
-Node** floyd_var(graph_t* graph, char* human){
+Node** floyd_var(Graph* graph, char* human){
     return NULL;
 }

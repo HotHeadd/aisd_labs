@@ -5,7 +5,7 @@
 #include "../library/src/gr_algo.h"
 #include "../library/src/gr_io.h"
 
-int exxit(graph_t* graph, char* human, char* fam, char* filename){
+int exxit(Graph* graph, char* human, char* fam, char* filename){
     printf("Выхожу...\n");
     free_graph(graph);
     free(human);
@@ -41,7 +41,7 @@ char* ask_name(char* prompt){
 
 int main(){
     char choice;
-    graph_t* graph = get_graph(SIZE);
+    Graph* graph = get_graph(SIZE);
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
     int res, relates, handshakes;
     res = gr_txt_in(&graph, "test");

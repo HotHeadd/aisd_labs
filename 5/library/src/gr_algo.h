@@ -2,6 +2,6 @@
 
 #include "gr_main.h"
 
-Node** dijkstra(graph_t* graph, char* first, char* second);
-Node** findwide(graph_t* graph, char* human, int handshakes);
-Node** floyd_var(graph_t* graph, char* human);
+Node** dijkstra(Graph* graph, char* first, char* second);
+Node** findwide(Graph* graph, char* human, int handshakes);
+Node** floyd_var(Graph* graph, char* human);

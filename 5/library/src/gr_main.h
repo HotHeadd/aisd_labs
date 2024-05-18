@@ -25,18 +25,18 @@ typedef struct Edge{
     struct Edge* next;
 } Edge;
 
-typedef struct graph_t{
+typedef struct Graph{
     int csize;
     int msize;
     Node** nodes;
-} graph_t;
+} Graph;
 
-graph_t* get_graph(int size);
-void free_graph(graph_t* graph);
+Graph* get_graph(int size);
+void free_graph(Graph* graph);
 
-int gr_add_node(graph_t* graph, char* human);
-int gr_add_edge(graph_t* graph, char* human, char* fam, int rel);
-int gr_del_node(graph_t *graph, char* human);
-int gr_del_edge(graph_t *graph, char* humanm, char* fam);
-int gr_change_node(graph_t* graph, char* human, char* neww);
-int gr_change_edge(graph_t* graph, char* human, char* neww, int rel);
+int gr_add_node(Graph* graph, char* human);
+int gr_add_edge(Graph* graph, char* human, char* fam, int rel);
+int gr_del_node(Graph *graph, char* human);
+int gr_del_edge(Graph *graph, char* humanm, char* fam);
+int gr_change_node(Graph* graph, char* human, char* neww);
+int gr_change_edge(Graph* graph, char* human, char* neww, int rel);

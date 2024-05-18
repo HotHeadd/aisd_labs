@@ -12,14 +12,14 @@ int hash(int size, char* string){
     return hash%(size);
 }
 
-graph_t* get_graph(int size){
-    graph_t* graph = calloc(1, sizeof(graph_t));
+Graph* get_graph(int size){
+    Graph* graph = calloc(1, sizeof(Graph));
     graph->msize = size;
     graph->csize = 0;
     graph->nodes = calloc(size, sizeof(Node*));
     return graph;
 }
-void free_graph(graph_t* graph){
+void free_graph(Graph* graph){
     if (graph == NULL) return;
     for (int i=0; i<graph->msize; i++){
         Node* elem = graph->nodes[i];
@@ -53,7 +53,7 @@ unsigned simple(unsigned size){
     return resault;
 }
 
-void extend(graph_t* graph){
+void extend(Graph* graph){
     int newsize = simple(graph->msize*2);
     printf("%d\n", newsize);
     Node** newnodes = calloc(newsize, sizeof(Node*));
@@ -68,7 +68,7 @@ void extend(graph_t* graph){
     graph->msize = newsize;
 }
 
-int gr_add_node(graph_t* graph, char* human){
+int gr_add_node(Graph* graph, char* human){
     int index = hash(graph->msize, human);
     Node* elem = graph->nodes[index];
     if (elem != NULL){
@@ -89,7 +89,7 @@ int gr_add_node(graph_t* graph, char* human){
     return GOOD;
 }
 
-Node* find(graph_t* graph, char* human){
+Node* find(Graph* graph, char* human){
     int index = hash(graph->msize, human);
     int start = index;
     Node* elem = graph->nodes[index];
@@ -104,7 +104,7 @@ Node* find(graph_t* graph, char* human){
     return NULL;
 }
 
-int gr_add_edge(graph_t* graph, char* human, char* fam, int rel){
+int gr_add_edge(Graph* graph, char* human, char* fam, int rel){
     Node* elem = find(graph, human);
     Node* check = find(graph, fam);
     if ((elem == NULL) || (check == NULL)) return ELEM_NOT_FOUND;
@@ -116,18 +116,18 @@ int gr_add_edge(graph_t* graph, char* human, char* fam, int rel){
     return GOOD;
 }
 
-int gr_del_node(graph_t *graph, char* human){
+int gr_del_node(Graph *graph, char* human){
     return 0;
 }
 
-int gr_del_edge(graph_t *graph, char* humanm, char* fam){
+int gr_del_edge(Graph *graph, char* humanm, char* fam){
     return 0;
 }
 
-int gr_change_node(graph_t* graph, char* human, char* neww){
+int gr_change_node(Graph* graph, char* human, char* neww){
     return 0;
 }
 
-int gr_change_edge(graph_t* graph, char* human, char* neww, int rel){
+int gr_change_edge(Graph* graph, char* human, char* neww, int rel){
     return 0;
 }

@@ -2,8 +2,8 @@
 
 #include "gr_main.h"
 
-void gr_out_list(const graph_t* graph);
-void gr_out_gv(const graph_t* graph);
+void gr_out_list(const Graph* graph);
+void gr_out_gv(const Graph* graph);
 
-int gr_txt_out(const graph_t* graph, const char* filename);
-int gr_txt_in(graph_t** graph, const char* filename);
+int gr_txt_out(const Graph* graph, const char* filename);
+int gr_txt_in(Graph** graph, const char* filename);

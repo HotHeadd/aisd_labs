@@ -1,12 +1,14 @@
 #include "gr_io.h"
+#include "gr_main.h"
 #include "basic.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <graphviz/gvc.h>
 
 #define EMPTY "&-&-&"
 
-void gr_out_list(const graph_t* graph){
+void gr_out_list(const Graph* graph){
     if (graph == NULL){
         printf("Графа нет\n");
         return;
@@ -27,10 +29,6 @@ void gr_out_list(const graph_t* graph){
     }
 }
 
-void gr_out_gv(const graph_t* graph){
-    return;
-}
-
 void output_edges(FILE* output, Node* elem){
     if (elem->edges == NULL) return;
     int amount = 1;
@@ -48,7 +46,7 @@ void output_edges(FILE* output, Node* elem){
     }
 }
 
-int gr_txt_out(const graph_t* graph, const char* filename){
+int gr_txt_out(const Graph* graph, const char* filename){
     FILE* output = fopen(filename, "w");
     if (output == NULL) return FILE_ERROR;
     for (int i=0; i<graph->msize;i++){
@@ -69,7 +67,7 @@ int gr_txt_out(const graph_t* graph, const char* filename){
     return GOOD;
 }
 
-int gr_txt_in(graph_t** graph, const char* filename){
+int gr_txt_in(Graph** graph, const char* filename){
     FILE* input = fopen(filename, "r");
     if (input == NULL) return FILE_ERROR;
     free_graph(*graph);
@@ -106,4 +104,49 @@ int gr_txt_in(graph_t** graph, const char* filename){
     free(name);
     fclose(input);
     return GOOD;
+}
+
+void fill_agraph(Agraph_t* agv, const Graph* graph){
+    Agnode_t *first, *second;
+    Agedge_t *Dedge;
+    for (int i=0; i<graph->msize;i++){
+        Node* elem = graph->nodes[i];
+        if ((elem != NULL) && (elem->state != -1))
+            if (strlen(elem->name) == 0){
+                agnode(agv, EMPTY, 1);
+            }
+            else agnode(agv, elem->name, 1);
+    }
+    for (int i=0; i<graph->msize;i++){
+        Node* elem = graph->nodes[i];
+        if ((elem != NULL) && (elem->state != -1)){
+            if (elem->edges == NULL) continue;
+            Edge* edge=elem->edges;
+            while (edge != NULL){
+                first = agnode(agv, elem->name, 1);
+                if (strlen(edge->dest) == 0)
+                    second = agnode(agv, EMPTY, 1);
+                else second = agnode(agv, edge->dest, 1);
+                Dedge = agedge(agv, first, second, 0, 1);
+                agsafeset(Dedge, "label", "  a to b", "");
+                edge = edge->next;
+            }
+        }
+    }
+}
+
+void gr_out_gv(const Graph* graph){
+    if (graph == NULL) return;
+    GVC_t *gvc = gvContext();
+    Agraph_t *agr = agopen("graph", Agdirected, 0);
+    fill_agraph(agr, graph);
+    gvLayout(gvc, agr, "dot");
+    FILE* out = fopen("image.svg", "w");
+    gvRender(gvc, agr, "svg", out); 
+    fclose(out);
+    system("nomacs image.svg -m frameless"); // просмотр изображения
+    remove("image.svg");
+    gvFreeLayout(gvc, agr);
+    agclose(agr);
+    gvFreeContext(gvc);
 }
