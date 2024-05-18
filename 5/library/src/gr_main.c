@@ -1,5 +1,6 @@
 #include "gr_main.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
@@ -65,14 +66,53 @@ graph_t* extend(graph_t* graph){
 
 int gr_add_node(graph_t* graph, char* human){
     int index = hash(graph, human);
-    if (graph->nodes[index] != NULL) return ELEM_EXIST;
+    Node* elem = graph->nodes[index];
+    if (elem != NULL){
+        while ((elem != NULL) && (elem->state == 1)){
+            if (strcmp(elem->name, human) == 0)
+                return ELEM_EXIST;
+            index = (index + 1)%graph->msize;
+            elem = graph->nodes[index];
+        }
+        graph->nodes[index]= calloc(1, sizeof(Node));
+        graph->nodes[index]->name = strdup(human);
+        graph->nodes[index]->state = 1;
+        return COLLISION;
+    }
     graph->nodes[index] = calloc(1, sizeof(Node));
     graph->nodes[index]->name = strdup(human);
+    graph->nodes[index]->state = 1; 
+    graph->csize++;
+    // if (graph->csize == graph->msize) //0,75 coef
+    //     extend(graph);
     return GOOD;
 }
 
+Node* find(graph_t* graph, char* human){
+    int index = hash(graph, human);
+    int start = index;
+    Node* elem = graph->nodes[index];
+    while (elem != NULL){
+        if ((elem->state == 1) && (strcmp(elem->name, human) == 0)){
+            return elem;
+        }
+        index = (index + 1)%graph->msize;
+        if (index == start) return NULL;
+        elem = graph->nodes[index];
+    }
+    return NULL;
+}
+
 int gr_add_edge(graph_t* graph, char* human, char* fam, int rel){
-    return 0;
+    Node* elem = find(graph, human);
+    Node* check = find(graph, fam);
+    if ((elem == NULL) || (check == NULL)) return ELEM_NOT_FOUND;
+    Edge* neww = calloc(1, sizeof(Edge));
+    neww->rel = rel;
+    neww->dest = strdup(fam);
+    neww->next = elem->edges;
+    elem->edges = neww;
+    return GOOD;
 }
 
 int gr_del_node(graph_t *graph, char* human){

@@ -59,7 +59,9 @@ int main(){
                 if (human == NULL) 
                     return exxit(graph, human, fam, filename);
                 res = gr_add_node(graph, human);
-                //res dev
+                if (res == GOOD) printf("Человек добавлен в граф\n");
+                if (res == ELEM_EXIST) printf("Человек с таким именем уже есть в графе\n");
+                if (res == COLLISION) printf("Колллизия!\n");
                 break;
             case '4':
                 free(human);
@@ -74,7 +76,8 @@ int main(){
                 if (res == END_INPUT) 
                     return exxit(graph, human, fam, filename);
                 res = gr_add_edge(graph, human, fam, relates);
-                //res dev
+                if (res == GOOD) printf("Оценка добавлена\n");
+                if (res == ELEM_NOT_FOUND) printf("Одного из людей нет в графе\n");
                 break;
             case '5':
                 free(human);

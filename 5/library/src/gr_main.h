@@ -1,11 +1,11 @@
 #pragma once
 
-#define SIZE 257
+#define SIZE 5 //257
 
 #define END_INPUT -1
 #define GOOD 0
 #define ELEM_EXIST 1
-#define ROOT_CREATED 2
+#define COLLISION 2
 #define ELEM_NOT_FOUND 3
 #define FILE_ERROR 4
 #define FORMAT_ERROR 5
@@ -13,11 +13,10 @@
 #define MULTIPLE_DATA 7
 #define LAST_ELEMENT 8
 
-
-
 typedef struct Node{
     char* name;
     struct Edge* edges;
+    short state;
 } Node;
 
 typedef struct Edge{
