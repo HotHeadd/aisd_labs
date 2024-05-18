@@ -40,11 +40,12 @@ char* ask_name(char* prompt){
 }
 
 int main(){
-    menus();
     char choice;
     graph_t* graph = get_graph(SIZE);
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
     int res, relates, handshakes;
+    res = gr_txt_in(&graph, "test");
+    menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
@@ -72,7 +73,7 @@ int main(){
                 fam = ask_name("Введите имя его знакомого: ");
                 if (fam == NULL) 
                     return exxit(graph, human, fam, filename);
-                res = custom_int_input("Введите оценку: ", &relates, always_false);
+                res = custom_int_input("Введите оценку (от -10 до 10): ", &relates, pmten);
                 if (res == END_INPUT) 
                     return exxit(graph, human, fam, filename);
                 res = gr_add_edge(graph, human, fam, relates);
@@ -120,7 +121,7 @@ int main(){
                 fam = ask_name("Введите имя его знакомого: ");
                 if (fam == NULL) 
                     return exxit(graph, human, fam, filename);
-                res = custom_int_input("Введите оценку: ", &relates, always_false);
+                res = custom_int_input("Введите оценку (от -10 до 10): ", &relates, pmten);
                 if (res == END_INPUT) 
                     return exxit(graph, human, fam, filename);
                 res = gr_change_edge(graph, human, fam, relates);
@@ -132,22 +133,24 @@ int main(){
                 if (filename == NULL) 
                     return exxit(graph, human, fam, filename);
                 res = gr_txt_out(graph, filename);
-                //res dev
+                if (res == GOOD) printf("Граф записан в файл %s\n", filename);
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
                 break;
             case 'i':
                 free(filename);
                 filename = g_readline("ВВОД Введите имя файла: ");
                 if (filename == NULL) 
                     return exxit(graph, human, fam, filename);
-                res = gr_txt_in(graph, filename);
-                //res dev
+                res = gr_txt_in(&graph, filename);
+                if (res == GOOD) printf("Граф считан из файла %s\n", filename);
+                if (res == FILE_ERROR) printf("Ошибка файла\n");
                 break;
             case 't':
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
                     return exxit(graph, human, fam, filename);
-                res = custom_int_input("Введите оценку: ", &handshakes, always_false);
+                res = custom_int_input("Введите рукопожатия: ", &handshakes, pmten);
                 if (res == END_INPUT) 
                     return exxit(graph, human, fam, filename);
                 findwide(graph, human, handshakes);

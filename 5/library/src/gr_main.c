@@ -4,12 +4,12 @@
 #include <string.h>
 #include <math.h>
 
-int hash(graph_t* graph, char* string){
+int hash(int size, char* string){
     int hash = 0;
     for (int i=0; i<strlen(string); i++){
         hash += string[i]*37 + string[i]%37;
     }
-    return hash%(graph->msize);
+    return hash%(size);
 }
 
 graph_t* get_graph(int size){
@@ -53,19 +53,23 @@ unsigned simple(unsigned size){
     return resault;
 }
 
-graph_t* extend(graph_t* graph){
-    graph_t* new_graph = get_graph(simple(graph->msize*2));
+void extend(graph_t* graph){
+    int newsize = simple(graph->msize*2);
+    printf("%d\n", newsize);
+    Node** newnodes = calloc(newsize, sizeof(Node*));
     for (int i=0; i<graph->msize;i++){
         Node* elem = graph->nodes[i];
         if (elem == NULL) continue;
-        ///
+        int index = hash(newsize, elem->name);
+        newnodes[index] = elem;
     }
-    // free_graph(graph);
-    return new_graph;
+    free(graph->nodes);
+    graph->nodes = newnodes;
+    graph->msize = newsize;
 }
 
 int gr_add_node(graph_t* graph, char* human){
-    int index = hash(graph, human);
+    int index = hash(graph->msize, human);
     Node* elem = graph->nodes[index];
     if (elem != NULL){
         while ((elem != NULL) && (elem->state == 1)){
@@ -74,22 +78,19 @@ int gr_add_node(graph_t* graph, char* human){
             index = (index + 1)%graph->msize;
             elem = graph->nodes[index];
         }
-        graph->nodes[index]= calloc(1, sizeof(Node));
-        graph->nodes[index]->name = strdup(human);
-        graph->nodes[index]->state = 1;
-        return COLLISION;
     }
     graph->nodes[index] = calloc(1, sizeof(Node));
     graph->nodes[index]->name = strdup(human);
     graph->nodes[index]->state = 1; 
     graph->csize++;
-    // if (graph->csize == graph->msize) //0,75 coef
-    //     extend(graph);
+    if (graph->csize >= ((double)(graph->msize))*(0.75)){
+        extend(graph);
+    }
     return GOOD;
 }
 
 Node* find(graph_t* graph, char* human){
-    int index = hash(graph, human);
+    int index = hash(graph->msize, human);
     int start = index;
     Node* elem = graph->nodes[index];
     while (elem != NULL){

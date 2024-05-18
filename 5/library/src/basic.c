@@ -8,6 +8,10 @@ int always_false(double x){
 	return x && 0;
 }
 
+int pmten(double x){
+	return (x > 10 || x < -10);
+}
+
 int only_negative(double x){
 	return x<=0;
 }
@@ -24,7 +28,7 @@ int custom_double_input(char* prompt, double* poin, int (*fun)(double)){
 	while ((fun(*poin))||(retu<1)||(tras!='\n')){
 		if (retu==-1) break;
 		while (tras != '\n') scanf("%c", &tras);
-		printf("Please, try again: ");
+		printf("Неправильный формат данных. Введите заново: ");
 		retu = scanf("%lf", poin);
 		scanf("%c", &tras);
 	}
@@ -39,7 +43,7 @@ int custom_int_input(char* prompt, int* poin, int (*fun)(double)){
 	while ((retu<1)||(fun(*poin))||(tras!='\n')){
 		if (retu==-1) break;
 		while (tras != '\n') scanf("%c", &tras);
-		printf("Please, try again: ");
+		printf("Неправильный формат данных. Введите заново: ");
 		retu = scanf("%d", poin);
 		scanf("%c", &tras);
 	}
@@ -53,7 +57,7 @@ int custom_uns_input(char* prompt, unsigned* poin, int (*fun)(double)){
 	while ((retu<1)||(fun(*poin))||(tras!='\n')){
 		if (retu==-1) break;
 		while (tras != '\n') scanf("%c", &tras);
-		printf("Please, try again: ");
+		printf("Неправильный формат данных. Введите заново: ");
 		retu = scanf("%u", poin);
 		scanf("%c", &tras);
 	}

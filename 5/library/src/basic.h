@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 int o_n_and_0(double);
+int pmten(double);
 int always_false(double);
 int only_negative(double);
 
