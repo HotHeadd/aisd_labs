@@ -1,0 +1,12 @@
+.vscode
+test
+*.png
+app
+count
+timer
+library/obj
+library/libmy.a
+obj
+testres
+experem
+shake%
