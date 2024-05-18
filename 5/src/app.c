@@ -8,6 +8,9 @@
 int exxit(graph_t* graph, char* human, char* fam, char* filename){
     printf("Выхожу...\n");
     free_graph(graph);
+    free(human);
+    free(fam);
+    free(filename);
     return 0;
 }
 
@@ -39,7 +42,7 @@ char* ask_name(char* prompt){
 int main(){
     menus();
     char choice;
-    graph_t* graph = get_graph();
+    graph_t* graph = get_graph(SIZE);
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
     int res, relates, handshakes;
     while ((choice = better_getchar()) != EOF){
@@ -57,7 +60,6 @@ int main(){
                     return exxit(graph, human, fam, filename);
                 res = gr_add_node(graph, human);
                 //res dev
-                free(human);
                 break;
             case '4':
                 free(human);
@@ -73,8 +75,6 @@ int main(){
                     return exxit(graph, human, fam, filename);
                 res = gr_add_edge(graph, human, fam, relates);
                 //res dev
-                free(human);
-                free(fam);
                 break;
             case '5':
                 free(human);
@@ -83,7 +83,6 @@ int main(){
                     return exxit(graph, human, fam, filename);
                 res = gr_del_node(graph, human);
                 //res dev
-                free(human);
                 break;
             case '6':
                 free(human);
@@ -108,7 +107,6 @@ int main(){
                     return exxit(graph, human, fam, filename);
                 res = gr_change_node(graph, human, newname);
                 //res dev
-                free(human);
                 break;
             case '8':
                 free(human);

@@ -1,15 +1,18 @@
 #pragma once
 
+#define SIZE 257
+
+#define END_INPUT -1
 #define GOOD 0
+#define ELEM_EXIST 1
 #define ROOT_CREATED 2
-#define KEY_EXIST 1
 #define ELEM_NOT_FOUND 3
 #define FILE_ERROR 4
 #define FORMAT_ERROR 5
 #define NO_TREE 6
 #define MULTIPLE_DATA 7
 #define LAST_ELEMENT 8
-#define END_INPUT -1
+
 
 
 typedef struct Node{
@@ -18,18 +21,18 @@ typedef struct Node{
 } Node;
 
 typedef struct Edge{
-    Node* dest;
+    char* dest;
     int rel;
     struct Edge* next;
 } Edge;
 
 typedef struct graph_t{
-    //int max_elems;
-    int amount;
+    int csize;
+    int msize;
     Node** nodes;
 } graph_t;
 
-graph_t* get_graph();
+graph_t* get_graph(int size);
 void free_graph(graph_t* graph);
 
 int gr_add_node(graph_t* graph, char* human);
