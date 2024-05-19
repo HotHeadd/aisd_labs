@@ -44,8 +44,9 @@ int main(){
     char choice;
     Graph* graph = get_graph(SIZE);
     Graph* result;
+    Node** dj_res;
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
-    int res, relates, handshakes;
+    int res, relates, handshakes, amount;
     res = gr_txt_in(&graph, "test");
     menus();
     while ((choice = better_getchar()) != EOF){
@@ -178,10 +179,15 @@ int main(){
                 fam = ask_name("Введите имя второго: ");
                 if (fam == NULL) 
                     return exxit(graph, human, fam, filename, newname);
-                dijkstra(graph, human, fam); 
-                // process return type
-                // print dijkstra res
-                // res dev
+                dj_res = dijkstra(graph, human, fam, &amount);
+                if (dj_res){
+                    print_res_dj(dj_res, amount);
+                    free(dj_res);
+                }
+                else {
+                    if (amount == -1) printf("Элемент %s недостижим из элемента %s\n", fam, human);
+                    else printf("Одного из людей нет в сети\n");
+                }
                 break;
             case 's':
                 free(human);

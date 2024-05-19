@@ -16,6 +16,7 @@
 typedef struct Node{
     char* name;
     struct Edge* edges;
+    struct Node* pred;
     char state;
     char color;
     int dist;
