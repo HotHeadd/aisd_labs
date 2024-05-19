@@ -43,6 +43,7 @@ char* ask_name(char* prompt){
 int main(){
     char choice;
     Graph* graph = get_graph(SIZE);
+    Graph* result;
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
     int res, relates, handshakes;
     res = gr_txt_in(&graph, "test");
@@ -50,7 +51,7 @@ int main(){
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
-                gr_out_list(graph);
+                gr_out_list(graph, "Здравствуйте, ваш граф:");
                 break;
             case '2':
                 gr_out_gv(graph);
@@ -160,9 +161,12 @@ int main(){
                 res = custom_int_input("Введите рукопожатия: ", &handshakes, pmten);
                 if (res == END_INPUT) 
                     return exxit(graph, human, fam, filename, newname);
-                findwide(graph, human, handshakes);
-                // process return type
-                // print findwide res
+                result = findwide(graph, human, handshakes);
+                if (result == NULL) printf("\n");
+                else{
+                    gr_out_list(result, "Перечень знакомых людей:");
+                }
+                free_graph(result);
                 // res dev
                 break;
             case 'f':

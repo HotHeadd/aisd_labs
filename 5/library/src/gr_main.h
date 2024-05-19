@@ -1,6 +1,6 @@
 #pragma once
 
-#define SIZE 5 //257
+#define SIZE 257
 
 #define END_INPUT -1
 #define GOOD 0
@@ -16,7 +16,9 @@
 typedef struct Node{
     char* name;
     struct Edge* edges;
-    short state;
+    char state;
+    char color;
+    int dist;
 } Node;
 
 typedef struct Edge{
@@ -33,6 +35,8 @@ typedef struct Graph{
 
 Graph* get_graph(int size);
 void free_graph(Graph* graph);
+
+Node* find(Graph* graph, char* human);
 
 int gr_add_node(Graph* graph, char* human);
 int gr_add_edge(Graph* graph, char* human, char* fam, int rel);

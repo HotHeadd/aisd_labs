@@ -9,12 +9,12 @@
 
 #define EMPTY "&-&-&"
 
-void gr_out_list(const Graph* graph){
+void gr_out_list(const Graph* graph, const char* prompt){
     if (graph == NULL){
         printf("Графа нет\n");
         return;
     }
-    printf("Здравствуйте, ваш граф:\n");
+    printf("%s\n", prompt);
     for (int i=0; i<graph->msize;i++){
         Node* elem = graph->nodes[i];
         if ((elem != NULL) && (elem->state == 1)){
@@ -26,7 +26,7 @@ void gr_out_list(const Graph* graph){
             }
             printf("\n");
         }
-        else printf("[NULL]\n");
+        // else printf("[NULL]\n");
     }
 }
 
