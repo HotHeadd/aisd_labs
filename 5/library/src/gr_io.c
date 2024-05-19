@@ -145,6 +145,7 @@ void gr_out_gv(const Graph* graph){
     if (graph == NULL) return;
     GVC_t *gvc = gvContext();
     Agraph_t *agr = agopen("graph", Agdirected, 0);
+    agattr(agr, AGRAPH, "rankdir", "LR");
     fill_agraph(agr, graph);
     gvLayout(gvc, agr, "dot");
     FILE* out = fopen("image.svg", "w");

@@ -105,9 +105,11 @@ Node** dijkstra(Graph* graph, char* first, char* second, int* amount){
     elem = end;
     while (elem != start){
         result[*amount] = elem;
-        *amount++;
+        *amount += 1;
         elem = elem->pred;
     }
+    result[*amount] = elem;
+    *amount += 1;
     return result;
 }
 
