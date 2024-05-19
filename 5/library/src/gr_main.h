@@ -9,7 +9,7 @@
 #define ELEM_NOT_FOUND 3
 #define FILE_ERROR 4
 #define FORMAT_ERROR 5
-#define NO_TREE 6
+#define IDIOT 6
 #define MULTIPLE_DATA 7
 #define LAST_ELEMENT 8
 

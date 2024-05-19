@@ -5,12 +5,13 @@
 #include "../library/src/gr_algo.h"
 #include "../library/src/gr_io.h"
 
-int exxit(Graph* graph, char* human, char* fam, char* filename){
+int exxit(Graph* graph, char* human, char* fam, char* filename, char* newn){
     printf("Выхожу...\n");
     free_graph(graph);
     free(human);
     free(fam);
     free(filename);
+    free(newn);
     return 0;
 }
 
@@ -58,7 +59,7 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_add_node(graph, human);
                 if (res == GOOD) printf("Человек добавлен в граф\n");
                 if (res == ELEM_EXIST) printf("Человек с таким именем уже есть в графе\n");
@@ -68,14 +69,14 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 free(fam);
                 fam = ask_name("Введите имя его знакомого: ");
                 if (fam == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = custom_int_input("Введите оценку (от -10 до 10): ", &relates, pmten);
                 if (res == END_INPUT) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_add_edge(graph, human, fam, relates);
                 if (res == GOOD) printf("Оценка добавлена\n");
                 if (res == ELEM_NOT_FOUND) printf("Одного из людей нет в графе\n");
@@ -84,7 +85,7 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_del_node(graph, human);
                 if (res == GOOD) printf("Человек ликвидирован\n"); 
                 if (res == ELEM_NOT_FOUND) printf("Человека нет в дереве\n");
@@ -93,11 +94,11 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 free(fam);
                 fam = ask_name("Введите имя его знакомого: ");
                 if (fam == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_del_edge(graph, human, fam);
                 if (res == GOOD) printf("Связь удалена\n"); 
                 if (res == ELEM_NOT_FOUND) printf("Одного из людей нет в дереве\n"); 
@@ -106,34 +107,38 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 free(newname);
                 newname = ask_name("Введите имя человека: ");
                 if (newname == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_change_node(graph, human, newname);
-                //res dev
+                if (res == GOOD) printf("Имя человека изменено с %s на %s\n", human, newname);
+                if (res == ELEM_NOT_FOUND) printf("Человека \"%s\" нет в сети\n", human);
+                if (res == ELEM_EXIST) printf("Человек \"%s\" уже есть в сети\n", newname);
+                if (res == IDIOT) printf("Введены одинаковые имена\n");
                 break;
             case '8':
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 free(fam);
                 fam = ask_name("Введите имя его знакомого: ");
                 if (fam == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = custom_int_input("Введите оценку (от -10 до 10): ", &relates, pmten);
                 if (res == END_INPUT) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_change_edge(graph, human, fam, relates);
-                //res dev
+                if (res == GOOD) printf("Связь изменена\n");
+                if (res == ELEM_NOT_FOUND) printf("Связи нет в сети\n");
                 break;
             case 'o':
                 free(filename);
                 filename = g_readline("ВЫВОД Введите имя файла: ");
                 if (filename == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_txt_out(graph, filename);
                 if (res == GOOD) printf("Граф записан в файл %s\n", filename);
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
@@ -142,7 +147,7 @@ int main(){
                 free(filename);
                 filename = g_readline("ВВОД Введите имя файла: ");
                 if (filename == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = gr_txt_in(&graph, filename);
                 if (res == GOOD) printf("Граф считан из файла %s\n", filename);
                 if (res == FILE_ERROR) printf("Ошибка файла\n");
@@ -151,10 +156,10 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 res = custom_int_input("Введите рукопожатия: ", &handshakes, pmten);
                 if (res == END_INPUT) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 findwide(graph, human, handshakes);
                 // process return type
                 // print findwide res
@@ -164,11 +169,11 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя первого: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 free(fam);
                 fam = ask_name("Введите имя второго: ");
                 if (fam == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 dijkstra(graph, human, fam); 
                 // process return type
                 // print dijkstra res
@@ -178,7 +183,7 @@ int main(){
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
-                    return exxit(graph, human, fam, filename);
+                    return exxit(graph, human, fam, filename, newname);
                 floyd_var(graph, human);
                 // process return type
                 // print findwide res
@@ -189,5 +194,5 @@ int main(){
         }
         menus();
     }
-    return exxit(graph, human, fam, filename);
+    return exxit(graph, human, fam, filename, newname);
 }
