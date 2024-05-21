@@ -179,20 +179,6 @@ Node** floyd_var(Graph* graph, char* human){
             }
         }
     }
-    printf("   ");
-    for (int i=0; i<amount;i++){
-        printf("%2s ", elems[i]->name);
-    }
-    printf("\n");
-    for (int j=0; j<amount; j++){
-        printf("%2s ", elems[j]->name);
-        for (int i=0; i<amount;i++){
-            if (mat[j][i] != MINF)
-                printf("%2d ", mat[j][i]);
-            else printf("MI ");
-        }
-        printf("\n");
-    }
     for (int i=0; i<amount; i++){
         free(mat[i]);
     }
