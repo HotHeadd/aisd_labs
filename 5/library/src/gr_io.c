@@ -124,6 +124,7 @@ void fill_agraph(Agraph_t* agv, const Graph* graph){
     for (int i=0; i<graph->msize;i++){
         Node* elem = graph->nodes[i];
         if ((elem != NULL) && (elem->state != -1)){
+            // printf("%d %s\n", i, elem->name);
             if (elem->edges == NULL) continue;
             Edge* edge=elem->edges;
             while (edge != NULL){
@@ -152,7 +153,7 @@ void gr_out_gv(const Graph* graph){
     gvRender(gvc, agr, "svg", out); 
     fclose(out);
     system("nomacs image.svg -m frameless"); // просмотр изображения
-    remove("image.svg");
+    // remove("image.svg");
     // gvFreeLayout(gvc, agr);
     agclose(agr);
     // gvFreeContext(gvc);

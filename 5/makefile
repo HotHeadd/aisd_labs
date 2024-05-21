@@ -1,4 +1,4 @@
-TARGET = app
+TARGET = datagen
 LIBNAME = my
 ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc# -D $(KEYWORD)
 CC = gcc
@@ -44,6 +44,9 @@ final : clean $(TARGET) # remove clean to turn off auto remake
 
 app : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)app.o
 	$(CC) -o app $(PROJ_OBJ)app.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
+
+datagen : $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(PROJ_OBJ) $(PROJ_OBJ)datagen.o
+	$(CC) -o data $(PROJ_OBJ)datagen.o -L$(LIB_LOCATION) -l$(LIBNAME) $(ENDCOMP) $(ENDFLAGS)
 
 $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) : $(LIB_PREF_OBJ) $(LIB_OBJ)
 	$(LEFT) $(LIB_LOCATION)/lib$(LIBNAME)$(FORMAT) $(LIB_PREF_OBJ)*.o
