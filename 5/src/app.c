@@ -47,7 +47,7 @@ int main(){
     Node** dj_res;
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
     int res, relates, handshakes, amount;
-    res = gr_txt_in(&graph, "test");
+    // res = gr_txt_in(&graph, "test");
     menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){

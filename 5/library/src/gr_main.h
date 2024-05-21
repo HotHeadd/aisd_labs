@@ -1,6 +1,6 @@
 #pragma once
 
-#define SIZE 257
+#define SIZE 2048
 
 #define END_INPUT -1
 #define GOOD 0

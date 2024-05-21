@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include "structs.h"
 #include <stdio.h>
+#include <string.h>
 
 #define INF 100000000
+#define MINF -100000000
 #define WHITE 0
 #define GREY 1
 #define BLACK 2
@@ -122,6 +124,79 @@ void print_res_dj(Node** result, int amount){
     printf("\n");
 }
 
+int max(int a, int b){
+    if (a > b) return a;
+    return b;
+}
+
+int find_in_elems(Node** mat, int amount, char* name){
+    int index = 0;
+    while (strcmp(mat[index]->name, name) != 0) index++;
+    return index;
+}
+
 Node** floyd_var(Graph* graph, char* human){
+    if (graph == NULL){
+        return NULL;
+    }
+    Node* first = find(graph, human);
+    if (first == NULL) return NULL;
+    int amount = 0, iter = 0;
+    for (int i=0;i<graph->msize;i++){
+        Node* elem = graph->nodes[i];
+        if ((elem != NULL) && (elem->state == 1))
+            amount++;
+    }
+    int **mat = calloc(amount, sizeof(int*));
+    Node** elems = calloc(amount, sizeof(Node*));
+    Node* elem;
+    for (int i=0;i<graph->msize;i++){
+        elem = graph->nodes[i];
+        if ((elem != NULL) && (elem->state == 1)){
+            mat[iter] = calloc(amount, sizeof(int));
+            for (int j=0; j<amount;j++){
+                mat[iter][j] = MINF;
+            }
+            elems[iter] = elem;
+            iter++;
+        }
+    }
+    for (int i=0; i<amount; i++){
+        mat[i][i] = 0;
+        elem = elems[i];
+        Edge* edge = elem->edges;
+        while (edge){
+            int index = find_in_elems(elems, amount, edge->dest);
+            mat[i][index] = edge->rel;
+            edge = edge->next;
+        }
+    }
+    for (int v=0; v<amount; v++){
+        for (int a=0; a<amount; a++){
+            for (int b=0; b<amount; b++){
+                if ((mat[a][v] != MINF) && (mat[v][b] != MINF))
+                    mat[a][b] = max(mat[a][v] + mat[v][b], mat[a][b]);
+            }
+        }
+    }
+    printf("   ");
+    for (int i=0; i<amount;i++){
+        printf("%2s ", elems[i]->name);
+    }
+    printf("\n");
+    for (int j=0; j<amount; j++){
+        printf("%2s ", elems[j]->name);
+        for (int i=0; i<amount;i++){
+            if (mat[j][i] != MINF)
+                printf("%2d ", mat[j][i]);
+            else printf("MI ");
+        }
+        printf("\n");
+    }
+    for (int i=0; i<amount; i++){
+        free(mat[i]);
+    }
+    free(mat);
+    free(elems);
     return NULL;
 }
