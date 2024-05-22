@@ -142,14 +142,14 @@ void fill_agraph(Agraph_t* agv, const Graph* graph){
     }
 }
 
-void gr_out_gv(const Graph* graph){
+void gr_out_gv(const Graph* graph, const char* filename){
     if (graph == NULL) return;
     GVC_t *gvc = gvContext();
     Agraph_t *agr = agopen("graph", Agdirected, 0);
     agattr(agr, AGRAPH, "rankdir", "LR");
     fill_agraph(agr, graph);
     gvLayout(gvc, agr, "dot");
-    FILE* out = fopen("image.svg", "w");
+    FILE* out = fopen(filename, "w");
     gvRender(gvc, agr, "svg", out); 
     fclose(out);
     // system("nomacs image.svg -m frameless"); // просмотр изображения

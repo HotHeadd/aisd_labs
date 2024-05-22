@@ -24,6 +24,17 @@ int main(){
         int index1 = i%1000, index2 = rand()%1000;
         gr_add_edge(graph, names[index1], names[index2], rand()%20-10);
     }
+    for (int i = 0, i<3; i++){
+        if (i == 0){
+            Graph* res = findwide(graph, names[rand()%1000], 10);
+        }
+        if (i == 1){
+
+        }
+        if (i == 2){
+
+        }
+    }
     gr_out_gv(graph); // их библиотечная функция не рендерит граф при таком большом кол-ве связей
     for (int i=0; i<1000;i++){
         free(names[i]);

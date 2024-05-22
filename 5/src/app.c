@@ -56,7 +56,7 @@ int main(){
                 gr_out_list(graph, "Здравствуйте, ваш граф:");
                 break;
             case '2':
-                gr_out_gv(graph);
+                gr_out_gv(graph, "image.svg");
                 break;
             case '3':
                 free(human);
