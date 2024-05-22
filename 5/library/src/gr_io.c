@@ -152,7 +152,7 @@ void gr_out_gv(const Graph* graph){
     FILE* out = fopen("image.svg", "w");
     gvRender(gvc, agr, "svg", out); 
     fclose(out);
-    system("nomacs image.svg -m frameless"); // просмотр изображения
+    // system("nomacs image.svg -m frameless"); // просмотр изображения
     // remove("image.svg");
     // gvFreeLayout(gvc, agr);
     agclose(agr);

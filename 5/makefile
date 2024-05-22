@@ -1,4 +1,4 @@
-TARGET = datagen
+TARGET = app
 LIBNAME = my
 ENDFLAGS = -lm -lreadline -g -lcgraph -lgvc# -D $(KEYWORD)
 CC = gcc

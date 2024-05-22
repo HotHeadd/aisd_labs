@@ -135,7 +135,8 @@ int find_in_elems(Node** mat, int amount, char* name){
     return index;
 }
 
-Node** floyd_var(Graph* graph, char* human){
+Node* floyd_var(Graph* graph, char* human, int* loop_check){
+    *loop_check = 0;
     if (graph == NULL){
         return NULL;
     }
@@ -161,12 +162,13 @@ Node** floyd_var(Graph* graph, char* human){
             iter++;
         }
     }
+    int index;
     for (int i=0; i<amount; i++){
         mat[i][i] = 0;
         elem = elems[i];
         Edge* edge = elem->edges;
         while (edge){
-            int index = find_in_elems(elems, amount, edge->dest);
+            index = find_in_elems(elems, amount, edge->dest);
             mat[i][index] = edge->rel;
             edge = edge->next;
         }
@@ -179,10 +181,27 @@ Node** floyd_var(Graph* graph, char* human){
             }
         }
     }
+    Node* result = NULL;
+    for (int i=0;i<amount;i++){
+        if (mat[i][i] != 0){
+            *loop_check = 1;
+        }
+    }
+    if (!(*loop_check)){
+        int maxval = MINF;
+        *loop_check = 2;
+        index = find_in_elems(elems, amount, human);
+        for (int i=0;i<amount;i++){
+            if ((mat[index][i] > maxval) && (index != i)){
+                maxval = mat[index][i];
+                result = elems[i];
+            }
+        }
+    }
     for (int i=0; i<amount; i++){
         free(mat[i]);
     }
     free(mat);
     free(elems);
-    return NULL;
+    return result;
 }

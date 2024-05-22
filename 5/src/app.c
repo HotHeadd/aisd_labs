@@ -45,9 +45,10 @@ int main(){
     Graph* graph = get_graph(SIZE);
     Graph* result;
     Node** dj_res;
+    Node* floyd;
     char *human = NULL, *fam = NULL, *newname = NULL, *filename = NULL;
     int res, relates, handshakes, amount;
-    // res = gr_txt_in(&graph, "test");
+    res = gr_txt_in(&graph, "test");
     menus();
     while ((choice = better_getchar()) != EOF){
         switch(choice){
@@ -190,14 +191,18 @@ int main(){
                 }
                 break;
             case 's':
+                int loop_check;
                 free(human);
                 human = ask_name("Введите имя человека: ");
                 if (human == NULL) 
                     return exxit(graph, human, fam, filename, newname);
-                floyd_var(graph, human);
-                // process return type
-                // print findwide res
-                // res dev
+                floyd = floyd_var(graph, human, &loop_check);
+                if (floyd != NULL) printf("Наилучший знакомый: \"%s\"\n", floyd->name);
+                else{
+                    if (loop_check == 0) printf("Человека нет в сети\n");
+                    if (loop_check == 1) printf("В графе есть цикл!\n");
+                    if (loop_check == 2) printf("Изолированная вершина\n");
+                }
                 break;
             default:
                 printf("Нет такой опции в меню!\n");
