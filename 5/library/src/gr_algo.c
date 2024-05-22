@@ -115,13 +115,14 @@ Node** dijkstra(Graph* graph, char* first, char* second, int* amount){
     return result;
 }
 
-void print_res_dj(Node** result, int amount){
-    printf("Здравствуйте, ваш %d путь\n", amount);
+void print_res_dj(Node** result, int amount, FILE* flow){
+    if (flow == stdout)
+        fprintf(flow, "Здравствуйте, ваш путь\n");
     for (int i=amount-1;i>=0;i--){
-        if (i != amount-1) printf (" -> ");
-        printf("\"%s\"", result[i]->name);
+        if (i != amount-1) fprintf (flow, " -> ");
+        fprintf(flow, "\"%s\"", result[i]->name);
     }
-    printf("\n");
+    fprintf(flow, "\n");
 }
 
 int max(int a, int b){
@@ -187,15 +188,12 @@ Node* floyd_var(Graph* graph, char* human, int* loop_check){
             *loop_check = 1;
         }
     }
-    if (!(*loop_check)){
-        int maxval = MINF;
-        *loop_check = 2;
-        index = find_in_elems(elems, amount, human);
-        for (int i=0;i<amount;i++){
-            if ((mat[index][i] > maxval) && (index != i)){
-                maxval = mat[index][i];
-                result = elems[i];
-            }
+    int maxval = MINF;
+    index = find_in_elems(elems, amount, human);
+    for (int i=0;i<amount;i++){
+        if ((mat[index][i] > maxval) && (index != i)){
+            maxval = mat[index][i];
+            result = elems[i];
         }
     }
     for (int i=0; i<amount; i++){

@@ -7,9 +7,9 @@ timer
 library/obj
 library/libmy.a
 obj
-testres
+test
 experem
 shake%
-test*
+test
 data
 image*

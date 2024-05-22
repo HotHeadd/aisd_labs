@@ -9,22 +9,23 @@
 
 #define EMPTY "&-&-&"
 
-void gr_out_list(const Graph* graph, const char* prompt){
+void gr_out_list(const Graph* graph, const char* prompt, FILE* flow){
     if (graph == NULL){
         printf("Графа нет\n");
         return;
     }
-    printf("%s\n", prompt);
+    if (flow == stdout)
+        printf("%s\n", prompt);
     for (int i=0; i<graph->msize;i++){
         Node* elem = graph->nodes[i];
         if ((elem != NULL) && (elem->state == 1)){
-            printf("\"%s\"", elem->name);
+            fprintf(flow, "\"%s\"", elem->name);
             Edge* edge = elem->edges;
             while (edge != NULL){
-                printf(" -> (\"%s\", %d)", edge->dest, edge->rel);
+                fprintf(flow, " -> (\"%s\", %d)", edge->dest, edge->rel);
                 edge = edge->next;
             }
-            printf("\n");
+            fprintf(flow, "\n");
         }
         // else printf("[NULL]\n");
     }
@@ -142,14 +143,60 @@ void fill_agraph(Agraph_t* agv, const Graph* graph){
     }
 }
 
-void gr_out_gv(const Graph* graph, const char* filename){
+void drawres(Agraph_t *agr, Graph* res1, char* person, \
+Node** res2, int amount, Node* res3, char* source){
+    Agnode_t *first, *second;
+    Agedge_t *Dedge;
+    if (res1 != NULL){
+        for (int i=0; i<res1->msize;i++){
+        Node* elem = res1->nodes[i];
+        if ((elem != NULL) && (elem->state != -1)){
+            first = agnode(agr, elem->name, 1);
+            agsafeset(first, "penwidth", "6", "");
+            agsafeset(first, "color", "red", "");
+        }
+        first = agnode(agr, person, 1);
+        agsafeset(first, "penwidth", "6", "");
+        agsafeset(first, "color", "green", "");
+    }
+    }
+    if (res2 != NULL){
+        for (int i=0; i<amount-1;i++){
+            first = agnode(agr, res2[i]->name, 1);
+            second = agnode(agr, res2[i+1]->name, 1);
+            Dedge = agedge(agr, second, first, 0, 1);
+            agsafeset(first, "penwidth", "6", "");
+            agsafeset(second, "penwidth", "6", "");
+            agsafeset(Dedge, "penwidth", "6", "");
+            agsafeset(first, "color", "red", "");
+            agsafeset(second, "color", "red", "");
+            agsafeset(Dedge, "color", "red", "");
+        }
+    }
+    if (res3 != NULL){
+        first = agnode(agr, res3->name, 1);
+        second = agnode(agr, source, 1);
+        agsafeset(first, "penwidth", "6", "");
+        agsafeset(second, "penwidth", "6", "");
+        agsafeset(first, "color", "red", "");
+        agsafeset(second, "color", "green", "");
+    }
+}
+
+void gr_out_gv(const Graph* graph, const char* filename,\
+Graph* res1, char* person, Node** res2, int amount, Node* res3, char* source){
     if (graph == NULL) return;
     GVC_t *gvc = gvContext();
     Agraph_t *agr = agopen("graph", Agdirected, 0);
     agattr(agr, AGRAPH, "rankdir", "LR");
     fill_agraph(agr, graph);
+    drawres(agr, res1, person, res2, amount, res3, source);
     gvLayout(gvc, agr, "dot");
     FILE* out = fopen(filename, "w");
+    if (out == NULL){
+        printf("BAAAAAAAAAAD\n");
+        return;
+    }
     gvRender(gvc, agr, "svg", out); 
     fclose(out);
     // system("nomacs image.svg -m frameless"); // просмотр изображения

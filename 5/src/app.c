@@ -53,10 +53,10 @@ int main(){
     while ((choice = better_getchar()) != EOF){
         switch(choice){
             case '1':
-                gr_out_list(graph, "Здравствуйте, ваш граф:");
+                gr_out_list(graph, "Здравствуйте, ваш граф:", stdout);
                 break;
             case '2':
-                gr_out_gv(graph, "image.svg");
+                gr_out_gv(graph, "image.svg", NULL, NULL, NULL, 0, NULL, NULL);
                 break;
             case '3':
                 free(human);
@@ -166,7 +166,7 @@ int main(){
                 result = findwide(graph, human, handshakes);
                 if (result == NULL) printf("\n");
                 else{
-                    gr_out_list(result, "Перечень знакомых людей:");
+                    gr_out_list(result, "Перечень знакомых людей:", stdout);
                 }
                 free_graph(result);
                 // res dev
@@ -182,7 +182,7 @@ int main(){
                     return exxit(graph, human, fam, filename, newname);
                 dj_res = dijkstra(graph, human, fam, &amount);
                 if (dj_res){
-                    print_res_dj(dj_res, amount);
+                    print_res_dj(dj_res, amount, stdout);
                     free(dj_res);
                 }
                 else {
@@ -197,11 +197,10 @@ int main(){
                 if (human == NULL) 
                     return exxit(graph, human, fam, filename, newname);
                 floyd = floyd_var(graph, human, &loop_check);
-                if (floyd != NULL) printf("Наилучший знакомый: \"%s\"\n", floyd->name);
+                if ((floyd != NULL) && (!loop_check)) printf("Наилучший знакомый: \"%s\"\n", floyd->name);
                 else{
-                    if (loop_check == 0) printf("Человека нет в сети\n");
-                    if (loop_check == 1) printf("В графе есть цикл!\n");
-                    if (loop_check == 2) printf("Изолированная вершина\n");
+                    if (floyd == NULL) printf("Человека нет в сети или человек без друзей\n");
+                    else if (loop_check == 1) printf("В графе есть цикл!\n");
                 }
                 break;
             default:
